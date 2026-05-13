@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FrameLab — PHAUXTO Prompt Engineer</title>
+    <title>PhauxtoLab</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👁</text></svg>" />
     <style>
         :root {
@@ -17,12 +17,29 @@
             --text: #dfd8cc;
             --text-muted: #7e7668;
             --text-dim: #3e3c38;
+            --text-bright: #ffffff;
             --border: #222018;
             --border-mid: #2e2b25;
             --success: #4a8447;
             --mono: 'Courier New', Courier, monospace;
             --serif: Georgia, 'Times New Roman', serif;
             --sans: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+        }
+        html.light {
+            --bg: #f4f1ec;
+            --bg-card: #ece8e0;
+            --bg-input: #e4dfd7;
+            --bg-hover: #dcd7ce;
+            --accent: #b06818;
+            --accent-dim: #8a4e0e;
+            --accent-glow: rgba(176, 104, 24, 0.10);
+            --text: #2c2218;
+            --text-muted: #6a5c4e;
+            --text-dim: #a89e94;
+            --text-bright: #1a120a;
+            --border: #d4cec6;
+            --border-mid: #c8c2b8;
+            --success: #3a7437;
         }
         *,
         *::before,
@@ -31,8 +48,7 @@
             margin: 0;
             padding: 0;
         }
-        html,
-        body {
+        html, body {
             height: 100%;
             overflow: hidden;
         }
@@ -45,7 +61,6 @@
             display: flex;
             flex-direction: column;
         }
-
         header {
             flex-shrink: 0;
             display: flex;
@@ -63,12 +78,10 @@
             letter-spacing: 0.04em;
             white-space: nowrap;
         }
-        .logo-sep {
-            color: var(--text-dim);
-        }
+        .logo-sep { color: var(--text-dim); }
         .logo-tagline {
             font-size: 0.85rem;
-            color: #ffffff;
+            color: var(--text-bright);
             letter-spacing: 0.05em;
             font-style: italic;
         }
@@ -86,10 +99,8 @@
             transition: all 0.12s;
             white-space: nowrap;
         }
-        .hbtn:hover {
-            border-color: var(--accent-dim);
-            color: var(--accent);
-        }
+        .hbtn:hover { border-color: var(--accent-dim); color: var(--accent); }
+        .theme-btn { margin-left: 0.3rem; font-size: 0.85rem; letter-spacing: 0; }
 
         .layout {
             flex: 1;
@@ -104,14 +115,33 @@
             min-height: 0;
             overflow: hidden;
         }
-        .col-chat {
-            border-right: 1px solid var(--border);
-        }
-        .col-wiki {
-            border-left: 1px solid var(--border);
-            background: var(--bg-card);
-        }
+        .col-chat { border-right: 1px solid var(--border); }
+        .col-wiki { border-left: 1px solid var(--border); background: var(--bg-card); }
 
+        /* ── PROGRESS DOTS ── */
+        .progress-dots {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            margin-bottom: 0.55rem;
+        }
+        .pd {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .pd-done { background: var(--accent-dim); }
+        .pd-active {
+            background: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+            width: 9px;
+            height: 9px;
+        }
+        .pd-idle { background: var(--border-mid); }
+
+        /* ── CHAT ── */
         .messages {
             flex: 1;
             overflow-y: auto;
@@ -121,16 +151,9 @@
             gap: 0.65rem;
             scroll-behavior: smooth;
         }
-        .msg {
-            display: flex;
-            flex-direction: column;
-        }
-        .msg.user {
-            align-items: flex-end;
-        }
-        .msg.bot {
-            align-items: flex-start;
-        }
+        .msg { display: flex; flex-direction: column; }
+        .msg.user { align-items: flex-end; }
+        .msg.bot { align-items: flex-start; }
         .bubble {
             padding: 0.55rem 0.75rem;
             max-width: 100%;
@@ -166,25 +189,10 @@
             text-align: left;
             font-family: inherit;
         }
-        .opt-btn:hover:not(:disabled) {
-            border-color: var(--accent-dim);
-            color: var(--text);
-        }
-        .opt-btn:disabled {
-            opacity: 0.35;
-            cursor: default;
-        }
-        .opt-btn.selected {
-            border-color: var(--accent);
-            color: var(--accent);
-            opacity: 1;
-        }
-        .confirm-btns {
-            display: flex;
-            gap: 0.4rem;
-            margin-top: 0.4rem;
-            flex-wrap: wrap;
-        }
+        .opt-btn:hover:not(:disabled) { border-color: var(--accent-dim); color: var(--text); }
+        .opt-btn:disabled { opacity: 0.35; cursor: default; }
+        .opt-btn.selected { border-color: var(--accent); color: var(--accent); opacity: 1; }
+        .confirm-btns { display: flex; gap: 0.4rem; margin-top: 0.4rem; flex-wrap: wrap; }
         .btn-yes {
             background: var(--accent);
             border: none;
@@ -197,9 +205,7 @@
             transition: opacity 0.15s;
             white-space: nowrap;
         }
-        .btn-yes:hover:not(:disabled) {
-            opacity: 0.82;
-        }
+        .btn-yes:hover:not(:disabled) { opacity: 0.82; }
         .btn-no {
             background: none;
             border: 1px solid var(--border-mid);
@@ -211,45 +217,19 @@
             transition: all 0.12s;
             white-space: nowrap;
         }
-        .btn-no:hover:not(:disabled) {
-            border-color: var(--accent-dim);
-            color: var(--text);
-        }
-        .btn-yes:disabled,
-        .btn-no:disabled {
-            opacity: 0.4;
-            cursor: default;
-        }
-        .typing {
-            display: flex;
-            gap: 4px;
-            padding: 3px 2px;
-        }
+        .btn-no:hover:not(:disabled) { border-color: var(--accent-dim); color: var(--text); }
+        .btn-yes:disabled, .btn-no:disabled { opacity: 0.4; cursor: default; }
+        .typing { display: flex; gap: 4px; padding: 3px 2px; }
         .dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: var(--accent);
-            opacity: 0.4;
+            width: 5px; height: 5px; border-radius: 50%;
+            background: var(--accent); opacity: 0.4;
             animation: pulse 1.3s infinite;
         }
-        .dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes pulse {
-            0%,
-            60%,
-            100% {
-                opacity: 0.3;
-                transform: translateY(0);
-            }
-            30% {
-                opacity: 1;
-                transform: translateY(-4px);
-            }
+            0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+            30% { opacity: 1; transform: translateY(-4px); }
         }
         .chat-footer {
             flex-shrink: 0;
@@ -257,10 +237,21 @@
             border-top: 1px solid var(--border);
             background: var(--bg-card);
         }
-        .input-row {
-            display: flex;
-            gap: 0.3rem;
+        .input-row { display: flex; gap: 0.3rem; }
+        .back-btn {
+            background: none;
+            border: 1px solid var(--border-mid);
+            border-radius: 3px;
+            color: var(--text-dim);
+            padding: 0.4rem 0.5rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex-shrink: 0;
+            line-height: 1;
         }
+        .back-btn:hover:not(:disabled) { border-color: var(--accent-dim); color: var(--accent); }
+        .back-btn:disabled { opacity: 0.22; cursor: default; }
         .chat-input-field {
             flex: 1;
             min-width: 0;
@@ -274,12 +265,8 @@
             outline: none;
             transition: border-color 0.15s;
         }
-        .chat-input-field:focus {
-            border-color: var(--accent-dim);
-        }
-        .chat-input-field::placeholder {
-            color: var(--text-dim);
-        }
+        .chat-input-field:focus { border-color: var(--accent-dim); }
+        .chat-input-field::placeholder { color: var(--text-dim); }
         .send-btn {
             background: var(--accent);
             border: none;
@@ -291,13 +278,12 @@
             transition: opacity 0.15s;
             flex-shrink: 0;
         }
-        .send-btn:hover {
-            opacity: 0.82;
-        }
+        .send-btn:hover { opacity: 0.82; }
         .hint {
             font-size: 0.63rem;
-            color: #ffffff;
+            color: var(--text-bright);
             margin-top: 0.3rem;
+            opacity: 0.7;
         }
         .new-shot-link {
             display: inline-block;
@@ -308,17 +294,11 @@
             font-size: 0.78rem;
             transition: color 0.12s;
         }
-        .new-shot-link:hover {
-            color: #e0a040;
-        }
-        .done-footer {
-            text-align: center;
-            padding: 0.65rem 0.7rem;
-        }
+        .new-shot-link:hover { color: #e0a040; }
+        .done-footer { text-align: center; padding: 0.65rem 0.7rem; }
 
-        .col-prompt {
-            border-right: 1px solid var(--border);
-        }
+        /* ── PROMPT PANEL ── */
+        .col-prompt { border-right: 1px solid var(--border); }
         .prompt-panel {
             flex: 1;
             overflow-y: auto;
@@ -334,22 +314,14 @@
             color: var(--text-dim);
             padding: 2rem 1rem;
         }
-        .empty-icon {
-            font-size: 1.8rem;
-            display: block;
-            margin-bottom: 0.65rem;
-            opacity: 0.4;
-        }
+        .empty-icon { font-size: 1.8rem; display: block; margin-bottom: 0.65rem; opacity: 0.4; }
         .empty-state p:first-of-type {
             font-family: var(--serif);
             font-size: 0.9rem;
             color: var(--text-muted);
             margin-bottom: 0.3rem;
         }
-        .empty-state p:last-of-type {
-            font-size: 0.72rem;
-            line-height: 1.6;
-        }
+        .empty-state p:last-of-type { font-size: 0.72rem; line-height: 1.6; }
         .shot-title {
             font-family: var(--serif);
             font-size: 1.1rem;
@@ -358,12 +330,33 @@
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
         }
+        .prompt-actions {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .save-md-btn {
+            background: none;
+            border: 1px solid var(--border-mid);
+            border-radius: 3px;
+            color: var(--text-muted);
+            padding: 0.22rem 0.55rem;
+            font-size: 0.65rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.12s;
+            white-space: nowrap;
+        }
+        .save-md-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
         .platform-tabs {
             display: flex;
             border: 1px solid var(--border-mid);
             border-radius: 3px;
             overflow: hidden;
             flex-shrink: 0;
+            flex: 1;
         }
         .ptab {
             flex: 1;
@@ -381,26 +374,11 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .ptab:last-child {
-            border-right: none;
-        }
-        .ptab:hover {
-            color: var(--text);
-            background: var(--bg-hover);
-        }
-        .ptab.active {
-            background: var(--accent-glow);
-            color: var(--accent);
-            box-shadow: inset 0 -2px 0 var(--accent);
-        }
-        .prompt-section {
-            display: none;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-        .prompt-section.active {
-            display: flex;
-        }
+        .ptab:last-child { border-right: none; }
+        .ptab:hover { color: var(--text); background: var(--bg-hover); }
+        .ptab.active { background: var(--accent-glow); color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+        .prompt-section { display: none; flex-direction: column; gap: 0.8rem; }
+        .prompt-section.active { display: flex; }
         .prompt-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -417,13 +395,7 @@
             background: var(--accent-glow);
             gap: 0.4rem;
         }
-        .card-label {
-            font-size: 0.63rem;
-            text-transform: uppercase;
-            letter-spacing: 0.09em;
-            color: var(--accent);
-            flex-shrink: 0;
-        }
+        .card-label { font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--accent); flex-shrink: 0; }
         .copy-btn {
             background: none;
             border: 1px solid var(--border-mid);
@@ -435,14 +407,8 @@
             transition: all 0.12s;
             flex-shrink: 0;
         }
-        .copy-btn:hover {
-            border-color: var(--accent-dim);
-            color: var(--accent);
-        }
-        .copy-btn.done {
-            border-color: var(--success);
-            color: #6ab668;
-        }
+        .copy-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+        .copy-btn.done { border-color: var(--success); color: #6ab668; }
         .prompt-text {
             font-family: var(--mono);
             font-size: 0.72rem;
@@ -453,9 +419,7 @@
             word-break: break-word;
             overflow-wrap: break-word;
         }
-        .prompt-text.neg {
-            color: #b85a5a;
-        }
+        .prompt-text.neg { color: #b85a5a; }
         .prompt-text.prose-style {
             font-family: var(--sans);
             font-size: 0.76rem;
@@ -464,12 +428,7 @@
             white-space: pre-wrap;
             word-break: break-word;
         }
-        .cfg-note {
-            font-size: 0.65rem;
-            color: #ffffff;
-            padding: 0.05rem 0.15rem;
-            flex-shrink: 0;
-        }
+        .cfg-note { font-size: 0.65rem; color: var(--text-bright); padding: 0.05rem 0.15rem; flex-shrink: 0; opacity: 0.75; }
         .why-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -478,19 +437,8 @@
             padding: 0.7rem 0.85rem;
             flex-shrink: 0;
         }
-        .why-title {
-            font-size: 0.63rem;
-            text-transform: uppercase;
-            letter-spacing: 0.09em;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-        .why-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.38rem;
-        }
+        .why-title { font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--accent); margin-bottom: 0.5rem; }
+        .why-list { list-style: none; display: flex; flex-direction: column; gap: 0.38rem; }
         .why-list li {
             font-size: 0.74rem;
             color: var(--text-muted);
@@ -498,12 +446,7 @@
             position: relative;
             line-height: 1.5;
         }
-        .why-list li::before {
-            content: '—';
-            position: absolute;
-            left: 0;
-            color: var(--accent-dim);
-        }
+        .why-list li::before { content: '—'; position: absolute; left: 0; color: var(--accent-dim); }
         .restart-link {
             font-size: 0.69rem;
             color: var(--text-dim);
@@ -514,10 +457,31 @@
             transition: color 0.12s;
             align-self: flex-start;
         }
-        .restart-link:hover {
-            color: var(--accent);
+        .restart-link:hover { color: var(--accent); }
+
+        /* ── TOKEN TOOLTIP ── */
+        .tok {
+            border-bottom: 1px dotted var(--accent-dim);
+            cursor: help;
+        }
+        #global-tip {
+            position: fixed;
+            z-index: 9999;
+            display: none;
+            background: var(--bg-card);
+            border: 1px solid var(--accent-dim);
+            color: var(--text);
+            font-size: 0.7rem;
+            font-family: var(--sans);
+            padding: 0.35rem 0.55rem;
+            border-radius: 3px;
+            max-width: 240px;
+            line-height: 1.45;
+            pointer-events: none;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.35);
         }
 
+        /* ── WIKI ── */
         .wiki-tabs {
             display: flex;
             border-bottom: 1px solid var(--border);
@@ -542,7 +506,7 @@
         .wtab:hover { color: var(--text); }
         .wtab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
         .wiki-body { flex: 1; overflow-y: auto; }
-        .wiki-intro { padding: 0.65rem 0.9rem; font-size: 0.84rem; color: #ffffff; border-bottom: 1px solid var(--border); line-height: 1.6; }
+        .wiki-intro { padding: 0.65rem 0.9rem; font-size: 0.84rem; color: var(--text-bright); border-bottom: 1px solid var(--border); line-height: 1.6; opacity: 0.85; }
         .wiki-group { border-bottom: 1px solid var(--border); }
         .wiki-group-hd { padding: 0.6rem 0.9rem 0.3rem; font-size: 0.78rem; font-weight: bold; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; }
         .wiki-item { padding: 0.4rem 0.9rem 0.65rem; }
@@ -550,7 +514,17 @@
         .wiki-item-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 0.22rem; }
         .wiki-item-eg { font-size: 0.76rem; color: var(--accent-dim); font-family: var(--mono); line-height: 1.5; }
         .jargon-search { padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-        .jargon-search input { width: 100%; background: var(--bg-input); border: 1px solid var(--border-mid); border-radius: 3px; padding: 0.4rem 0.65rem; color: var(--text); font-size: 0.85rem; outline: none; transition: border-color 0.15s; }
+        .jargon-search input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-mid);
+            border-radius: 3px;
+            padding: 0.4rem 0.65rem;
+            color: var(--text);
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.15s;
+        }
         .jargon-search input:focus { border-color: var(--accent-dim); }
         .jargon-search input::placeholder { color: var(--text-dim); }
         .g-item { padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--border); }
@@ -558,6 +532,7 @@
         .g-def { font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; }
         .g-empty { padding: 1.2rem 0.9rem; font-size: 0.85rem; color: var(--text-dim); }
 
+        /* ── FOOTER ── */
         .site-footer {
             flex-shrink: 0;
             display: flex;
@@ -584,11 +559,14 @@
 <body>
 
     <header>
-        <span class="logo-name">&#128065; FrameLab</span>
+        <span class="logo-name">&#128065; PhauxtoLab</span>
         <span class="logo-sep">/</span>
-        <span class="logo-tagline">photography prompt engineer — no camera knowledge needed</span>
+        <span class="logo-tagline">phauxtography prompt engineer — no camera knowledge needed</span>
         <button class="hbtn" onclick="resetApp()">&#8635; RESET</button>
+        <button class="hbtn theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle light/dark theme">&#9790;</button>
     </header>
+
+    <div id="global-tip"></div>
 
     <div class="layout">
 
@@ -597,11 +575,12 @@
             <div class="messages" id="messages"></div>
             <div class="chat-footer" id="chatFooter">
                 <div class="input-row" id="inputRow">
+                    <button class="back-btn" id="backBtn" onclick="goBack()" title="Revise previous answer" disabled>&#8592;</button>
                     <input type="text" class="chat-input-field" id="userInput" placeholder="Type your answer..."
-                    onkeydown="if(event.key==='Enter')sendMsg()" />
+                        onkeydown="if(event.key==='Enter')sendMsg()" />
                     <button class="send-btn" onclick="sendMsg()">&#8594;</button>
                 </div>
-                <div class="hint" id="hintText">Enter to send &nbsp;&bull;&nbsp; type <em>skip</em> to use a default</div>
+                <div class="hint">Enter to send &nbsp;&bull;&nbsp; type <em>skip</em> to use a default</div>
             </div>
         </div>
 
@@ -638,80 +617,175 @@
     </footer>
 
     <script>
-        // ── WIKI DATA ──────────────────────────────────────────────────
+        // ── TOKEN TOOLTIP DICTIONARY ──────────────────────────────────
+        const TOKEN_TIPS = {
+            'micro_texture_retention': 'Keeps fine surface detail — fabric weave, skin pores, wood grain — instead of AI smoothing it away',
+            'shadow_detail_not_crushed': 'Preserves visible information in dark areas rather than rendering them as solid black voids',
+            'no_beauty_smoothing': 'Prevents AI from automatically softening surfaces the way a beauty filter would',
+            'no_skin_plasticity': 'Stops AI from making skin look like wax or plastic — keeps natural imperfections visible',
+            'visible_pores_and_fine_lines': 'Ensures skin shows real pores and fine lines rather than the airbrushed AI default',
+            'natural_blemishes_preserved': 'Keeps real skin blemishes, spots, and marks that AI would otherwise remove',
+            'uneven_tone_natural': 'Allows natural color variation in skin rather than an even, processed tone',
+            'sweat_or_oil_present_if_logical': 'Adds realistic sweat or skin oil when the scene context calls for it',
+            'skin_pore_visibility_native': 'Shows pores at their real size — not enlarged or eliminated',
+            'makeup_texture_visible': 'Keeps the physical texture of makeup products rather than making them look painted on',
+            'surface_micro_abrasions': 'Adds the tiny scratches and wear marks that real objects accumulate over time',
+            'uneven_specular_highlights': 'Makes reflective highlights varied and irregular, not perfectly round like CGI',
+            'no_synthetic_sharpening': 'Prevents AI from adding artificial edge sharpening that real lenses never produce',
+            'fabric_weave_resolved': 'Keeps the actual weave pattern of fabric visible instead of blending it flat',
+            'real_mtf_falloff': 'Applies real lens sharpness behavior — sharpest at center, naturally softer toward edges',
+            'no_ai_edge_haloing': 'Removes the bright glow AI adds around object edges — a common neural-render artifact',
+            'mixed_color_temp_conflict': 'Keeps tension between warm and cool light sources rather than correcting it away',
+            'inverse_square_falloff_enforced': 'Light dims realistically with distance — twice as far means a quarter the brightness',
+            'sensor_native_noise_floor': 'Includes the baseline noise a real camera sensor produces in low light',
+            'chroma_noise_lowlight_edges': 'Adds color speckle (red/green/blue dots) in shadow areas, as real sensors produce',
+            'practical_light_contamination': 'Allows light from real-world sources (lamps, signs, screens) to spill and mix naturally',
+            'iso_native_grain_structure': 'Film or sensor grain matches what a real camera produces at the implied ISO setting',
+            'highlight_rolloff_analog': 'Bright areas transition gradually to white, retaining texture — like film rather than clipping',
+            'lens_micro_flare': 'Adds subtle lens flare from bright light sources — an optical artifact of real glass',
+            'specular_clipping_prevented': 'Prevents blown-out pure white highlights — keeps texture visible even in the brightest spots',
+            'vignetting_optical_not_post': 'Corner darkening from the lens itself, irregular and organic — not a post-process filter',
+            'demosaic_micro_artifacts': 'Includes tiny color fringe artifacts from how digital sensors decode color information',
+            'edge_softness_physical': 'Edges soften the way a real lens softens them — gradually and organically',
+            'focus_plane_rolloff_real': 'Sharpness transitions smoothly from in-focus to out-of-focus, as real lenses do',
+            'breathing_minimal_but_present': 'Slight optical irregularity in focus — as if the lens breathed slightly when focusing',
+            'coma_at_frame_edges': 'Points of light at frame edges streak slightly — a real wide-aperture lens artifact',
+            'fixed_pattern_noise_subtle': 'Faint repeating noise from the sensor\'s read pattern — natural in long digital exposures',
+            'longitudinal_chromatic_aberration': 'Color fringing along depth — purple in front of focus, green behind — from real glass optics',
+            'compression_artifact_absence': 'Avoids JPEG-like blocking that makes images look digitally processed',
+        };
+
+        function annotateTokens(rawText) {
+            const matches = [];
+            for (const [token, tip] of Object.entries(TOKEN_TIPS)) {
+                let idx = rawText.indexOf(token);
+                while (idx !== -1) {
+                    matches.push({ idx, len: token.length, token, tip });
+                    idx = rawText.indexOf(token, idx + 1);
+                }
+            }
+            matches.sort((a, b) => a.idx - b.idx);
+            const filtered = [];
+            let lastEnd = 0;
+            for (const m of matches) {
+                if (m.idx >= lastEnd) { filtered.push(m); lastEnd = m.idx + m.len; }
+            }
+            let result = '', pos = 0;
+            for (const m of filtered) {
+                result += h(rawText.slice(pos, m.idx));
+                result += `<span class="tok" data-tip="${h(m.tip)}">${h(m.token)}</span>`;
+                pos = m.idx + m.len;
+            }
+            result += h(rawText.slice(pos));
+            return result;
+        }
+
+        // ── TOOLTIP SYSTEM ────────────────────────────────────────────
+        const tipEl = document.getElementById('global-tip');
+        document.addEventListener('mouseover', e => {
+            const tok = e.target.closest('[data-tip]');
+            if (tok) { tipEl.textContent = tok.dataset.tip; tipEl.style.display = 'block'; }
+        });
+        document.addEventListener('mouseout', e => {
+            if (e.target.closest('[data-tip]')) tipEl.style.display = 'none';
+        });
+        document.addEventListener('mousemove', e => {
+            if (tipEl.style.display !== 'none') {
+                const x = Math.min(e.clientX + 14, window.innerWidth - 260);
+                tipEl.style.left = x + 'px';
+                tipEl.style.top = (e.clientY - 10) + 'px';
+            }
+        });
+
+        // ── THEME ─────────────────────────────────────────────────────
+        function toggleTheme() {
+            const isLight = document.documentElement.classList.toggle('light');
+            document.getElementById('themeBtn').innerHTML = isLight ? '&#9728;' : '&#9790;';
+            try { localStorage.setItem('phauxto-theme', isLight ? 'light' : 'dark'); } catch(e) {}
+        }
+        function initTheme() {
+            try {
+                if (localStorage.getItem('phauxto-theme') === 'light') {
+                    document.documentElement.classList.add('light');
+                    document.getElementById('themeBtn').innerHTML = '&#9728;';
+                }
+            } catch(e) {}
+        }
+
+        // ── WIKI DATA ─────────────────────────────────────────────────
         const WIKI = {
             lighting: {
                 intro: "Lighting is the single biggest factor in how an image feels. These are the most common approaches and what they do emotionally.",
                 groups: [
                     { label: "Natural — Outdoors", items: [
-                            { name: "Golden Hour", desc: "The hour after sunrise and before sunset. Light is warm, directional, and soft — wraps gently around subjects and casts long amber shadows. Forgiving and beautiful almost automatically.", eg: '→ "warm golden hour, low directional sun, long amber shadows"' },
-                            { name: "Overcast / Flat Light", desc: "Solid cloud cover acts like a giant softbox. Even, shadow-free, slightly cool. Excellent for documentary work where you don't want dramatic light to distract.", eg: '→ "soft overcast light, diffused, no direct sun, flat tones"' },
-                            { name: "Harsh Midday Sun", desc: "Direct overhead sun creates hard shadows and high contrast. Unflattering for faces, but dramatic for architecture and street scenes where contrast tells the story.", eg: '→ "harsh midday sun, deep cast shadows, hard contrast"' },
-                            { name: "Blue Hour / Dusk", desc: "The 20 minutes before sunrise or after sunset. Sky turns deep blue, ambient light goes cool and even. Any artificial lights glow warmly against the blue.", eg: '→ "blue hour, deep blue sky, warm window light, dusk"' }
-                        ] },
+                        { name: "Golden Hour", desc: "The hour after sunrise and before sunset. Light is warm, directional, and soft — wraps gently around subjects and casts long amber shadows. Forgiving and beautiful almost automatically.", eg: '→ "warm golden hour, low directional sun, long amber shadows"' },
+                        { name: "Overcast / Flat Light", desc: "Solid cloud cover acts like a giant softbox. Even, shadow-free, slightly cool. Excellent for documentary work where you don't want dramatic light to distract.", eg: '→ "soft overcast light, diffused, no direct sun, flat tones"' },
+                        { name: "Harsh Midday Sun", desc: "Direct overhead sun creates hard shadows and high contrast. Unflattering for faces, but dramatic for architecture and street scenes where contrast tells the story.", eg: '→ "harsh midday sun, deep cast shadows, hard contrast"' },
+                        { name: "Blue Hour / Dusk", desc: "The 20 minutes before sunrise or after sunset. Sky turns deep blue, ambient light goes cool and even. Any artificial lights glow warmly against the blue.", eg: '→ "blue hour, deep blue sky, warm window light, dusk"' }
+                    ] },
                     { label: "Artificial — Indoors", items: [
-                            { name: "Practical Lamp Light", desc: "Lamps that exist within the scene itself. Warm, contained pools of light. Strong falloff so lit areas glow while shadows are dramatic and fast.", eg: '→ "practical lamp illumination, warm tungsten glow, dark corners"' },
-                            { name: "Neon / Signage", desc: "Colored light from signs, screens, or neon tubes. Creates saturated color casts. Associated with night, rain, and urban atmosphere.", eg: '→ "neon sign light, magenta and blue cast, rain-wet reflections"' },
-                            { name: "Window Light", desc: "Daylight through a window — soft and directional on one side, gradual shadow on the other. One of the most flattering and honest portrait lighting setups.", eg: '→ "window light, soft directional, one-sided shadows"' }
-                        ] },
+                        { name: "Practical Lamp Light", desc: "Lamps that exist within the scene itself. Warm, contained pools of light. Strong falloff so lit areas glow while shadows are dramatic and fast.", eg: '→ "practical lamp illumination, warm tungsten glow, dark corners"' },
+                        { name: "Neon / Signage", desc: "Colored light from signs, screens, or neon tubes. Creates saturated color casts. Associated with night, rain, and urban atmosphere.", eg: '→ "neon sign light, magenta and blue cast, rain-wet reflections"' },
+                        { name: "Window Light", desc: "Daylight through a window — soft and directional on one side, gradual shadow on the other. One of the most flattering and honest portrait lighting setups.", eg: '→ "window light, soft directional, one-sided shadows"' }
+                    ] },
                     { label: "Mixed Sources", items: [
-                            { name: "Warm + Cool Conflict", desc: "When two light sources of different colors compete — a warm lamp and a cool window — you get a natural color tension that reads as cinematic and authentic.", eg: '→ "mixed light, warm tungsten interior, cool daylight window"' },
-                            { name: "Fluorescent / Office", desc: "Flat, greenish-white, unflattering. Deliberately mundane. Useful when the point is ordinary, institutional, or alienated.", eg: '→ "fluorescent ceiling light, flat greenish cast, institutional"' }
-                        ] }
+                        { name: "Warm + Cool Conflict", desc: "When two light sources of different colors compete — a warm lamp and a cool window — you get a natural color tension that reads as cinematic and authentic.", eg: '→ "mixed light, warm tungsten interior, cool daylight window"' },
+                        { name: "Fluorescent / Office", desc: "Flat, greenish-white, unflattering. Deliberately mundane. Useful when the point is ordinary, institutional, or alienated.", eg: '→ "fluorescent ceiling light, flat greenish cast, institutional"' }
+                    ] }
                 ]
             },
             texture: {
                 intro: "Texture determines whether the image feels alive and physical, or clean and digital. It's mostly about how the camera itself recorded the image.",
                 groups: [
                     { label: "Film (Analog)", items: [
-                            { name: "35mm Film — Standard", desc: "A warm, organic grain pattern that varies naturally across the frame. Slightly softer than digital, with richer color. The default for a 'photographic' feel.", eg: '→ "35mm film, fine grain, natural color, optical vignette"' },
-                            { name: "35mm Film — Pushed", desc: "Shooting film at higher sensitivity produces heavier grain, more contrast, and slight color shifts. Gritty and kinetic — common in reportage and street work.", eg: '→ "pushed 35mm film, heavy grain, high contrast, color shift"' },
-                            { name: "Medium Format Film", desc: "Larger film frame means richer detail, more tonal range, and a center-sharp-edge-soft quality. Feels expensive and deliberate. Used in fashion and fine art.", eg: '→ "medium format film, rich tonal depth, gentle edge softness"' },
-                            { name: "Expired / Aged Film", desc: "Film past its expiration shifts warm, gains grain, loses contrast. Each roll behaves differently. Organic, degraded, and impossible to replicate digitally.", eg: '→ "expired film, warm color drift, faded contrast, heavy grain"' }
-                        ] },
+                        { name: "35mm Film — Standard", desc: "A warm, organic grain pattern that varies naturally across the frame. Slightly softer than digital, with richer color. The default for a 'photographic' feel.", eg: '→ "35mm film, fine grain, natural color, optical vignette"' },
+                        { name: "35mm Film — Pushed", desc: "Shooting film at higher sensitivity produces heavier grain, more contrast, and slight color shifts. Gritty and kinetic — common in reportage and street work.", eg: '→ "pushed 35mm film, heavy grain, high contrast, color shift"' },
+                        { name: "Medium Format Film", desc: "Larger film frame means richer detail, more tonal range, and a center-sharp-edge-soft quality. Feels expensive and deliberate. Used in fashion and fine art.", eg: '→ "medium format film, rich tonal depth, gentle edge softness"' },
+                        { name: "Expired / Aged Film", desc: "Film past its expiration shifts warm, gains grain, loses contrast. Each roll behaves differently. Organic, degraded, and impossible to replicate digitally.", eg: '→ "expired film, warm color drift, faded contrast, heavy grain"' }
+                    ] },
                     { label: "Digital", items: [
-                            { name: "Modern Digital — Clean", desc: "Contemporary camera sensors at low sensitivity. Crisp, precise, no grain, high dynamic range. Clinical at worst, razor-sharp at best.", eg: '→ "clean digital, no grain, sharp rendering, precise"' },
-                            { name: "Modern Digital — High ISO", desc: "Pushing a digital sensor in low light creates speckled, multicolored noise rather than warm film grain. Urgent, raw, and immediate.", eg: '→ "high ISO digital noise, color speckle in shadows, handheld"' },
-                            { name: "Early Digital (2000s)", desc: "Early cameras had small sensors, limited dynamic range, and an overprocessed look. Nostalgic and lo-fi — a deliberate aesthetic choice.", eg: '→ "early digital camera, low resolution, compressed, 2000s look"' }
-                        ] }
+                        { name: "Modern Digital — Clean", desc: "Contemporary camera sensors at low sensitivity. Crisp, precise, no grain, high dynamic range. Clinical at worst, razor-sharp at best.", eg: '→ "clean digital, no grain, sharp rendering, precise"' },
+                        { name: "Modern Digital — High ISO", desc: "Pushing a digital sensor in low light creates speckled, multicolored noise rather than warm film grain. Urgent, raw, and immediate.", eg: '→ "high ISO digital noise, color speckle in shadows, handheld"' },
+                        { name: "Early Digital (2000s)", desc: "Early cameras had small sensors, limited dynamic range, and an overprocessed look. Nostalgic and lo-fi — a deliberate aesthetic choice.", eg: '→ "early digital camera, low resolution, compressed, 2000s look"' }
+                    ] }
                 ]
             },
             mood: {
                 intro: "Mood is the emotional signature of the image. It should drive every other decision — light, color, and texture all serve it.",
                 groups: [
                     { label: "Quiet / Still", items: [
-                            { name: "Melancholy", desc: "Sadness held calmly. Contemplative rather than dramatic. Often solitary subjects, muted palette, soft directional light. The mood of memory and longing.", eg: '→ "melancholy, quiet solitude, muted cool tones, contemplative"' },
-                            { name: "Peaceful / Serene", desc: "An absence of tension. Open spaces, gentle light, minimal elements. The image asks nothing of the viewer.", eg: '→ "peaceful, serene stillness, open space, warm morning light"' },
-                            { name: "Lonely", desc: "The presence of absence. A small figure in a large empty space. Emotional weight through scale and isolation.", eg: '→ "solitary, isolated, small figure, vast empty environment"' }
-                        ] },
+                        { name: "Melancholy", desc: "Sadness held calmly. Contemplative rather than dramatic. Often solitary subjects, muted palette, soft directional light. The mood of memory and longing.", eg: '→ "melancholy, quiet solitude, muted cool tones, contemplative"' },
+                        { name: "Peaceful / Serene", desc: "An absence of tension. Open spaces, gentle light, minimal elements. The image asks nothing of the viewer.", eg: '→ "peaceful, serene stillness, open space, warm morning light"' },
+                        { name: "Lonely", desc: "The presence of absence. A small figure in a large empty space. Emotional weight through scale and isolation.", eg: '→ "solitary, isolated, small figure, vast empty environment"' }
+                    ] },
                     { label: "Tense / Charged", items: [
-                            { name: "Uneasy / Unsettled", desc: "Something feels slightly wrong but you can't name it. Off-center framing, hard shadows, slightly cold color. The feeling of a moment about to shift.", eg: '→ "uneasy, slightly menacing, hard shadows, cold blue tones"' },
-                            { name: "Dramatic / Charged", desc: "High contrast, strong light and shadow, heightened presence. The image has weight and consequence.", eg: '→ "dramatic, high contrast, charged atmosphere, weighted presence"' },
-                            { name: "Claustrophobic", desc: "Tight framing, shallow depth, close walls. The environment presses in. Associated with urban density and psychological pressure.", eg: '→ "claustrophobic, tight framing, shallow depth, compressed space"' }
-                        ] },
+                        { name: "Uneasy / Unsettled", desc: "Something feels slightly wrong but you can't name it. Off-center framing, hard shadows, slightly cold color. The feeling of a moment about to shift.", eg: '→ "uneasy, slightly menacing, hard shadows, cold blue tones"' },
+                        { name: "Dramatic / Charged", desc: "High contrast, strong light and shadow, heightened presence. The image has weight and consequence.", eg: '→ "dramatic, high contrast, charged atmosphere, weighted presence"' },
+                        { name: "Claustrophobic", desc: "Tight framing, shallow depth, close walls. The environment presses in. Associated with urban density and psychological pressure.", eg: '→ "claustrophobic, tight framing, shallow depth, compressed space"' }
+                    ] },
                     { label: "Warm / Human", items: [
-                            { name: "Intimate / Tender", desc: "Close proximity, soft light, warm tones. The image feels like being let into a private moment rather than observed from outside.", eg: '→ "warm, intimate, close, soft window light, tender"' },
-                            { name: "Euphoric / Energized", desc: "Motion, brightness, color. A feeling of being fully alive in a moment. Open light, wide aperture, and often some blur from movement.", eg: '→ "euphoric, kinetic, bright open light, moment of aliveness"' }
-                        ] }
+                        { name: "Intimate / Tender", desc: "Close proximity, soft light, warm tones. The image feels like being let into a private moment rather than observed from outside.", eg: '→ "warm, intimate, close, soft window light, tender"' },
+                        { name: "Euphoric / Energized", desc: "Motion, brightness, color. A feeling of being fully alive in a moment. Open light, wide aperture, and often some blur from movement.", eg: '→ "euphoric, kinetic, bright open light, moment of aliveness"' }
+                    ] }
                 ]
             },
             style: {
                 intro: "Style determines the visual language and conventions the image speaks. Different traditions have different relationships to the subject.",
                 groups: [
                     { label: "Documentary / Real", items: [
-                            { name: "Street Photography", desc: "Candid shots in public. Unposed, unscripted. The world as it is, not as arranged. Associated with Cartier-Bresson, Vivian Maier, Fan Ho.", eg: '→ "street photography, candid, unposed, decisive moment"' },
-                            { name: "Photojournalism / Reportage", desc: "Story-driven documentary photography. Images communicate events and contexts. Prioritizes information over aesthetics.", eg: '→ "photojournalistic, reportage, unmanipulated, factual scene"' },
-                            { name: "Environmental Portrait", desc: "A person photographed within their natural context — workplace, home, community. The environment explains the person.", eg: '→ "environmental portrait, subject in context, documentary intimacy"' }
-                        ] },
+                        { name: "Street Photography", desc: "Candid shots in public. Unposed, unscripted. The world as it is, not as arranged. Associated with Cartier-Bresson, Vivian Maier, Fan Ho.", eg: '→ "street photography, candid, unposed, decisive moment"' },
+                        { name: "Photojournalism / Reportage", desc: "Story-driven documentary photography. Images communicate events and contexts. Prioritizes information over aesthetics.", eg: '→ "photojournalistic, reportage, unmanipulated, factual scene"' },
+                        { name: "Environmental Portrait", desc: "A person photographed within their natural context — workplace, home, community. The environment explains the person.", eg: '→ "environmental portrait, subject in context, documentary intimacy"' }
+                    ] },
                     { label: "Constructed / Crafted", items: [
-                            { name: "Editorial Portrait", desc: "Controlled and intentional but meant to feel natural. Made for magazines. Designed lighting and composition, but should feel like a real person.", eg: '→ "editorial portrait, controlled lighting, magazine-ready"' },
-                            { name: "Fashion Photography", desc: "The subject wears something. Styled, lit, and composed to serve the clothing or look. Ranges from stark minimalism to elaborate staging.", eg: '→ "fashion editorial, styled, deliberate clothing, fashion-forward"' },
-                            { name: "Still Life / Object Study", desc: "Inanimate objects photographed with deliberate attention. Surfaces, light, and arrangement carry all the meaning.", eg: '→ "still life, object study, controlled light on surface"' }
-                        ] },
+                        { name: "Editorial Portrait", desc: "Controlled and intentional but meant to feel natural. Made for magazines. Designed lighting and composition, but should feel like a real person.", eg: '→ "editorial portrait, controlled lighting, magazine-ready"' },
+                        { name: "Fashion Photography", desc: "The subject wears something. Styled, lit, and composed to serve the clothing or look. Ranges from stark minimalism to elaborate staging.", eg: '→ "fashion editorial, styled, deliberate clothing, fashion-forward"' },
+                        { name: "Still Life / Object Study", desc: "Inanimate objects photographed with deliberate attention. Surfaces, light, and arrangement carry all the meaning.", eg: '→ "still life, object study, controlled light on surface"' }
+                    ] },
                     { label: "Spatial / Environmental", items: [
-                            { name: "Architectural", desc: "Buildings and spaces photographed for their structural and aesthetic qualities. Precise verticals, attention to material and light on surface.", eg: '→ "architectural photography, precise geometry, material texture"' },
-                            { name: "Landscape / Nature", desc: "The natural world as primary subject. Scale, atmosphere, and light as storytellers. Often wide depth of field.", eg: '→ "landscape photography, natural light, environmental scale, wide depth"' }
-                        ] }
+                        { name: "Architectural", desc: "Buildings and spaces photographed for their structural and aesthetic qualities. Precise verticals, attention to material and light on surface.", eg: '→ "architectural photography, precise geometry, material texture"' },
+                        { name: "Landscape / Nature", desc: "The natural world as primary subject. Scale, atmosphere, and light as storytellers. Often wide depth of field.", eg: '→ "landscape photography, natural light, environmental scale, wide depth"' }
+                    ] }
                 ]
             }
         };
@@ -759,86 +833,218 @@
             'nan goldin': { style: 'intimate snapshot, diary-style', texture: '35mm, visible grain, warm color cast, sometimes underexposed', mood: 'intimate, raw, vulnerable, tender', lighting: 'available light, warm interiors, practical lamps' }
         };
 
+        // ── QUESTIONS (step counter removed from text — shown as dots) ──
         const QS = [
-            { id: 'subject', q: "<strong>Q1 of 7 &mdash; Subject</strong><br><br>What&rsquo;s the main subject? A person, object, animal, landscape, building &mdash; anything.", ack: a => `Subject: ${a}.`, ph: "e.g. an elderly woman at a market, a rusted bicycle...", skip: "an anonymous figure, partially obscured", opts: ["A person or face", "An animal", "An object or still life", "A landscape or nature", "A building or city"] },
-            { id: 'setting', q: "<strong>Q2 of 7 &mdash; Setting</strong><br><br>Where does this scene take place? Indoor, outdoor, city, nature &mdash; as vague or specific as you like.", ack: a => `Setting: ${a}.`, ph: "e.g. rain-soaked Tokyo alley, quiet kitchen...", skip: "an ambiguous, non-specific location", opts: ["City / urban street", "Nature / outdoors", "Indoor / domestic", "Studio", "Abstract or unclear"] },
-            { id: 'lighting', q: "<strong>Q3 of 7 &mdash; Lighting</strong><br><br>What&rsquo;s the lighting like? Time of day, type of source, or just a feeling &mdash; &ldquo;harsh&rdquo; or &ldquo;soft and warm&rdquo; both work.<br><br><em style='color:var(--text-dim)'>Tip: check the Lighting tab &rarr;</em>", ack: a => `Lighting: ${a}.`, ph: "e.g. golden hour, dim lamps, overcast, neon at night...", skip: "overcast natural daylight, soft and diffused", opts: ["Golden hour / sunset", "Low light / night", "Overcast / flat", "Mixed warm + cool", "Harsh direct sun"] },
-            { id: 'mood', q: "<strong>Q4 of 7 &mdash; Mood</strong><br><br>What feeling should the image carry?<br><br><em style='color:var(--text-dim)'>Tip: check the Mood tab &rarr;</em>", ack: a => `Mood: ${a}.`, ph: "e.g. melancholy, tense, peaceful, warm and intimate...", skip: "neutral, observational, quiet tension", opts: ["Melancholy / quiet", "Tense / uneasy", "Peaceful / still", "Dramatic / charged", "Warm / intimate"] },
-            { id: 'style', q: "<strong>Q5 of 7 &mdash; Style</strong><br><br>What kind of photo does this feel like?<br><br><em style='color:var(--text-dim)'>Tip: check the Style tab &rarr;</em>", ack: a => `Style: ${a}.`, ph: "e.g. street documentary, editorial portrait, Saul Leiter...", skip: "documentary / candid street photography", opts: ["Street / documentary", "Portrait / editorial", "Fashion", "Architectural", "Landscape / nature", "Street / documentary", "Saul Leiter", "Fan Ho", "Vivian Maier", "Daido Moriyama", "William Eggleston", "Henri Cartier-Bresson", "Nan Goldin", "Cindy Sherman", "Annie Leibovitz", "Gregory Crewdson"] },
-            { id: 'texture', q: "<strong>Q6 of 7 &mdash; Texture</strong><br><br>Film or digital? Grainy or crisp?<br><br><em style='color:var(--text-dim)'>Tip: check the Texture tab &rarr;</em>", ack: a => `Texture: ${a}.`, ph: "e.g. 35mm film grain, clean digital, expired film...", skip: "fine-grain 35mm film, moderate organic texture", opts: ["Film / grainy / analog", "Digital / crisp / clean", "Medium format", "Aged / expired film", "No preference"] },
-            { id: 'platform', q: "<strong>Q7 of 7 &mdash; Platform</strong><br><br>Which image generator are you using? Each platform uses a different prompt format.", ack: a => `Platform: ${a}. Building your prompts now.`, ph: "Midjourney, DALL-E 3, Stable Diffusion, or not sure...", skip: "Universal", opts: ["Midjourney", "DALL-E 3", "Stable Diffusion / Flux", "Not sure &mdash; give me all"] }
+            { id: 'subject',  q: "<strong>Subject</strong><br><br>What&rsquo;s the main subject? A person, object, animal, landscape, building &mdash; anything.",                                             ack: a => `Subject: ${a}.`,    ph: "e.g. an elderly woman at a market, a rusted bicycle...",  skip: "an anonymous figure, partially obscured",          opts: ["A person or face", "An animal", "An object or still life", "A landscape or nature", "A building or city"] },
+            { id: 'setting',  q: "<strong>Setting</strong><br><br>Where does this scene take place? Indoor, outdoor, city, nature &mdash; as vague or specific as you like.",                               ack: a => `Setting: ${a}.`,    ph: "e.g. rain-soaked Tokyo alley, quiet kitchen...",          skip: "an ambiguous, non-specific location",               opts: ["City / urban street", "Nature / outdoors", "Indoor / domestic", "Studio", "Abstract or unclear"] },
+            { id: 'lighting', q: "<strong>Lighting</strong><br><br>What&rsquo;s the lighting like? Time of day, type of source, or just a feeling.<br><br><em style='color:var(--text-dim)'>Tip: check the Lighting tab &rarr;</em>", ack: a => `Lighting: ${a}.`,   ph: "e.g. golden hour, dim lamps, overcast, neon at night...", skip: "overcast natural daylight, soft and diffused",      opts: ["Golden hour / sunset", "Low light / night", "Overcast / flat", "Mixed warm + cool", "Harsh direct sun"] },
+            { id: 'mood',     q: "<strong>Mood</strong><br><br>What feeling should the image carry?<br><br><em style='color:var(--text-dim)'>Tip: check the Mood tab &rarr;</em>",                          ack: a => `Mood: ${a}.`,       ph: "e.g. melancholy, tense, peaceful, warm and intimate...",  skip: "neutral, observational, quiet tension",             opts: ["Melancholy / quiet", "Tense / uneasy", "Peaceful / still", "Dramatic / charged", "Warm / intimate"] },
+            { id: 'style',    q: "<strong>Style</strong><br><br>What kind of photo does this feel like?<br><br><em style='color:var(--text-dim)'>Tip: check the Style tab &rarr;</em>",                     ack: a => `Style: ${a}.`,      ph: "e.g. street documentary, editorial portrait...",          skip: "documentary / candid street photography",           opts: ["Street / documentary", "Portrait / editorial", "Fashion", "Architectural", "Landscape / nature", "Fantasy / concept art", "Saul Leiter", "Fan Ho", "Vivian Maier", "Daido Moriyama", "William Eggleston", "Henri Cartier-Bresson", "Nan Goldin", "Cindy Sherman", "Annie Leibovitz", "Gregory Crewdson"] },
+            { id: 'texture',  q: "<strong>Texture</strong><br><br>Film or digital? Grainy or crisp?<br><br><em style='color:var(--text-dim)'>Tip: check the Texture tab &rarr;</em>",                       ack: a => `Texture: ${a}.`,    ph: "e.g. 35mm film grain, clean digital, expired film...",    skip: "fine-grain 35mm film, moderate organic texture",    opts: ["Film / grainy / analog", "Digital / crisp / clean", "Medium format", "Aged / expired film", "No preference"] },
+            { id: 'platform', q: "<strong>Platform</strong><br><br>Which image generator are you using? Each platform uses a different prompt format.",                                                       ack: a => `Platform: ${a}. Building your prompts now.`, ph: "Midjourney, DALL-E 3, Stable Diffusion, or not sure...", skip: "Universal", opts: ["Midjourney", "DALL-E 3", "Stable Diffusion / Flux", "Not sure &mdash; give me all"] }
         ];
 
         let ST = { step: 0, answers: {}, phase: 'qa', confirming: false };
+        let currentResult = null;
 
-        function detectPhotographer(text) { const lower = text.toLowerCase(); for (const [name, data] of Object.entries(PHOTOGRAPHERS)) { if (lower.includes(name)) return { name, data }; } return null; }
-        function applyPhotographer(data) { const filled = []; for (const key of ['style', 'texture', 'mood', 'lighting']) { if (!ST.answers[key] && data[key]) { ST.answers[key] = data[key]; filled.push(key); } } return filled; }
+        // ── PROGRESS DOTS ─────────────────────────────────────────────
+        function progressDotsHtml(activeStep) {
+            const dots = QS.map((q, i) => {
+                const cls = i < activeStep ? 'pd-done' : (i === activeStep ? 'pd-active' : 'pd-idle');
+                return `<span class="pd ${cls}" title="Q${i+1}: ${q.id}"></span>`;
+            }).join('');
+            return `<div class="progress-dots" title="Step ${activeStep+1} of ${QS.length}">${dots}</div>`;
+        }
 
+        // ── BACK NAVIGATION ───────────────────────────────────────────
+        function goBack() {
+            if (ST.step <= 0 || ST.confirming || ST.phase !== 'qa') return;
+            ST.step--;
+            const q = QS[ST.step];
+            delete ST.answers[q.id];
+            addUser('← Back');
+            updateBackBtn();
+            setTimeout(() => {
+                const inp = document.getElementById('userInput');
+                if (inp) { inp.placeholder = q.ph; inp.value = ''; }
+                addBot(progressDotsHtml(ST.step) + `<em style="color:var(--text-dim);font-size:0.73rem;">Revising Q${ST.step+1}:</em><br><br>${q.q}`, { opts: q.opts });
+                setTimeout(() => { const i2 = document.getElementById('userInput'); if (i2) i2.focus(); }, 50);
+            }, 200);
+        }
+
+        function updateBackBtn() {
+            const btn = document.getElementById('backBtn');
+            if (btn) btn.disabled = ST.step <= 0 || ST.confirming;
+        }
+
+        // ── PHOTOGRAPHER DETECTION ────────────────────────────────────
+        function detectPhotographer(text) {
+            const lower = text.toLowerCase();
+            for (const [name, data] of Object.entries(PHOTOGRAPHERS)) {
+                if (lower.includes(name)) return { name, data };
+            }
+            return null;
+        }
+        function applyPhotographer(data) {
+            const filled = [];
+            for (const key of ['style', 'texture', 'mood', 'lighting']) {
+                if (!ST.answers[key] && data[key]) { ST.answers[key] = data[key]; filled.push(key); }
+            }
+            return filled;
+        }
+
+        // ── INJECTED TOKENS ───────────────────────────────────────────
         function getInjectedTokens(answers) {
-            const tokens = new Set(['micro texture retention', 'shadow detail not crushed', 'no beauty smoothing']);
+            const tokens = new Set(['micro_texture_retention', 'shadow_detail_not_crushed', 'no_beauty_smoothing']);
             const all = Object.values(answers).join(' ').toLowerCase();
             const sub = (answers.subject || '').toLowerCase();
             const light = (answers.lighting || '').toLowerCase();
             const style = (answers.style || '').toLowerCase();
             const tex = (answers.texture || '').toLowerCase();
-            if (/person|face|portrait|figure|human/.test(sub)) { tokens.add('no skin plasticity'); tokens.add('visible pores and fine lines'); tokens.add('natural blemishes preserved'); tokens.add('uneven skin tone natural'); if (/sweat|hot|exertion|humid/.test(all)) tokens.add('natural skin sheen where physically appropriate'); }
-            if (/object|product|still life/.test(all)) { tokens.add('surface micro-abrasions'); tokens.add('uneven specular highlights'); tokens.add('no synthetic sharpening'); }
-            if (/landscape|nature|forest|mountain/.test(sub) || style.includes('landscape')) { tokens.add('real lens MTF falloff'); tokens.add('no AI edge haloing'); tokens.add('mixed color temperature conflict preserved'); tokens.add('inverse square light falloff enforced'); }
-            if (/night|dark|low light|dim|neon|practical/.test(light)) { tokens.add('sensor native noise floor'); tokens.add('chroma noise in shadow edges'); tokens.add('practical light contamination'); tokens.add('ISO-native grain structure'); }
-            if (/golden hour|sunset|sunrise|warm directional/.test(light)) { tokens.add('inverse square falloff enforced'); tokens.add('analog highlight rolloff'); tokens.add('lens micro-flare'); }
-            if (/mixed|fluorescent|tungsten|conflict/.test(light)) { tokens.add('mixed color temperature conflict preserved'); }
-            if (/overcast|flat|diffused|soft/.test(light)) { tokens.add('real lens falloff toward edges'); tokens.add('no AI edge haloing'); }
-            if (style.includes('street') || style.includes('documentary') || style.includes('reportage')) { tokens.add('surface micro-abrasions'); tokens.add('practical light contamination'); tokens.add('optical vignette (not post)'); tokens.add('demosaic micro-artifacts subtle'); }
-            if (style.includes('portrait') || style.includes('editorial') || style.includes('fashion')) { tokens.add('edge softness physical toward corners'); tokens.add('focus plane rolloff real'); tokens.add('no skin plasticity'); tokens.add('uneven specular highlights'); }
-            if (style.includes('architectural') || style.includes('urban')) { tokens.add('surface micro-abrasions'); tokens.add('optical vignette'); tokens.add('edge softness physical'); tokens.add('coma at frame edges subtle'); }
-            if (style.includes('macro') || style.includes('close-up')) { tokens.add('micro texture retention'); tokens.add('focus plane rolloff real'); tokens.add('fixed pattern noise subtle'); tokens.add('no synthetic sharpening'); }
-            if (tex.includes('film') || tex.includes('grainy') || tex.includes('analog') || tex.includes('expired') || tex.includes('aged')) { tokens.add('film grain organic'); tokens.add('chroma noise lowlight edges'); tokens.add('optical vignette'); tokens.add('longitudinal chromatic aberration subtle'); }
-            if (tex.includes('digital') || tex.includes('crisp') || tex.includes('clean')) { tokens.add('no synthetic sharpening'); tokens.add('no AI edge haloing'); }
-            if (tex.includes('medium format') || tex.includes('large format')) { tokens.add('real MTF falloff'); tokens.add('micro texture retention'); tokens.add('edge softness physical'); tokens.add('no AI edge haloing'); }
+            if (/person|face|portrait|figure|human/.test(sub)) {
+                tokens.add('no_skin_plasticity'); tokens.add('visible_pores_and_fine_lines');
+                tokens.add('natural_blemishes_preserved'); tokens.add('uneven_tone_natural');
+                if (/sweat|hot|exertion|humid/.test(all)) tokens.add('sweat_or_oil_present_if_logical');
+                tokens.add('skin_pore_visibility_native');
+                if (style.includes('fashion') || style.includes('editorial') || /makeup|cosmetic/.test(all)) tokens.add('makeup_texture_visible');
+            }
+            if (/object|product|still_life/.test(all)) {
+                tokens.add('surface_micro_abrasions'); tokens.add('uneven_specular_highlights');
+                tokens.add('no_synthetic_sharpening');
+                if (/fabric|textile|cloth|dress|shirt|linen|wool|cotton/.test(all)) tokens.add('fabric_weave_resolved');
+            }
+            if (/landscape|nature|forest|mountain/.test(sub) || style.includes('landscape')) {
+                tokens.add('real_mtf_falloff'); tokens.add('no_ai_edge_haloing');
+                tokens.add('mixed_color_temp_conflict'); tokens.add('inverse_square_falloff_enforced');
+            }
+            if (/night|dark|low_light|dim|neon|practical/.test(light)) {
+                tokens.add('sensor_native_noise_floor'); tokens.add('chroma_noise_lowlight_edges');
+                tokens.add('practical_light_contamination'); tokens.add('iso_native_grain_structure');
+            }
+            if (/golden_hour|sunset|sunrise|warm_directional/.test(light)) {
+                tokens.add('inverse_square_falloff_enforced'); tokens.add('highlight_rolloff_analog'); tokens.add('lens_micro_flare');
+            }
+            if (/mixed|fluorescent|tungsten|conflict/.test(light)) tokens.add('mixed_color_temp_conflict');
+            if (/overcast|flat|diffused|soft/.test(light)) { tokens.add('real_mtf_falloff'); tokens.add('no_ai_edge_haloing'); }
+            if (/harsh|direct_sun|midday/.test(light)) { tokens.add('specular_clipping_prevented'); tokens.add('highlight_rolloff_analog'); }
+            if (style.includes('street') || style.includes('documentary') || style.includes('reportage')) {
+                tokens.add('surface_micro_abrasions'); tokens.add('practical_light_contamination');
+                tokens.add('vignetting_optical_not_post'); tokens.add('demosaic_micro_artifacts');
+            }
+            if (style.includes('portrait') || style.includes('editorial') || style.includes('fashion')) {
+                tokens.add('edge_softness_physical'); tokens.add('focus_plane_rolloff_real');
+                tokens.add('no_skin_plasticity'); tokens.add('uneven_specular_highlights'); tokens.add('breathing_minimal_but_present');
+            }
+            if (style.includes('architectural') || style.includes('urban')) {
+                tokens.add('surface_micro_abrasions'); tokens.add('vignetting_optical_not_post');
+                tokens.add('edge_softness_physical'); tokens.add('coma_at_frame_edges');
+            }
+            if (style.includes('macro') || style.includes('close-up')) {
+                tokens.add('micro_texture_retention'); tokens.add('focus_plane_rolloff_real');
+                tokens.add('fixed_pattern_noise_subtle'); tokens.add('no_synthetic_sharpening');
+            }
+            if (style.includes('fantasy') || style.includes('concept_art') || style.includes('magical')) {
+                tokens.add('real_mtf_falloff'); tokens.add('no_ai_edge_haloing');
+                tokens.add('highlight_rolloff_analog'); tokens.add('longitudinal_chromatic_aberration');
+                tokens.add('practical_light_contamination'); tokens.add('inverse_square_falloff_enforced');
+            }
+            if (tex.includes('film') || tex.includes('grainy') || tex.includes('analog') || tex.includes('expired') || tex.includes('aged')) {
+                tokens.add('iso_native_grain_structure'); tokens.add('chroma_noise_lowlight_edges');
+                tokens.add('vignetting_optical_not_post'); tokens.add('longitudinal_chromatic_aberration');
+            }
+            if (tex.includes('digital') || tex.includes('crisp') || tex.includes('clean')) {
+                tokens.add('no_synthetic_sharpening'); tokens.add('no_ai_edge_haloing'); tokens.add('compression_artifact_absence');
+            }
+            if (tex.includes('medium_format') || tex.includes('large_format')) {
+                tokens.add('real_mtf_falloff'); tokens.add('micro_texture_retention');
+                tokens.add('edge_softness_physical'); tokens.add('no_ai_edge_haloing');
+            }
             return Array.from(tokens);
         }
 
-        function dSub(s) { s = (s || '').toLowerCase(); if (/person|woman|man|girl|boy|figure|human|face|child|elder|portrait|model|worker|people/.test(s)) return 'person'; if (/animal|dog|cat|bird|horse|wildlife|creature/.test(s)) return 'animal'; if (/landscape|mountain|forest|ocean|sea|lake|river|field|desert|nature|valley/.test(s)) return 'landscape'; if (/building|architecture|city|street|urban|bridge|tower|facade|room|alley/.test(s)) return 'arch'; return 'object'; }
-        function dLight(s) { s = (s || '').toLowerCase(); if (/golden|sunset|sunrise|dusk|dawn|warm light|evening|magic hour/.test(s)) return 'golden'; if (/night|low light|dark|neon|lamp|candle|dim|interior|practical/.test(s)) return 'lowlight'; if (/mixed|conflict|fluorescent|tungsten|window|warm.+cool|cool.+warm/.test(s)) return 'mixed'; return 'overcast'; }
-        function dStyle(s) { s = (s || '').toLowerCase(); if (/street|documentary|candid|reportage|journalism|leiter|bresson|vivian|fan ho|arbus|winogrand/.test(s)) return 'street'; if (/portrait|editorial|fashion|magazine|studio|sherman|avedon/.test(s)) return 'portrait'; if (/landscape|nature|wilderness|environmental/.test(s)) return 'landscape'; if (/architect|urban|building|infrastructure|minimal/.test(s)) return 'arch'; if (/macro|close.?up|detail/.test(s)) return 'macro'; return 'street'; }
-        function dTex(s) { s = (s || '').toLowerCase(); if (/digital|crisp|clean|sharp|modern|precise/.test(s)) return 'digital'; if (/medium format|hasselblad|mamiya|large format/.test(s)) return 'medium'; if (/aged|faded|expired|vintage|damaged/.test(s)) return 'aged'; return 'film'; }
-        function dPlat(s) { s = (s || '').toLowerCase(); if (/midjourney|mj/.test(s)) return 'mj'; if (/dall|dalle/.test(s)) return 'dalle'; if (/stable|flux|sd/.test(s)) return 'sd'; return 'universal'; }
+        // ── BUILDERS ──────────────────────────────────────────────────
+        function dSub(s) { s=(s||'').toLowerCase(); if(/person|woman|man|girl|boy|figure|human|face|child|elder|portrait|model|worker|people/.test(s))return'person'; if(/animal|dog|cat|bird|horse|wildlife|creature/.test(s))return'animal'; if(/landscape|mountain|forest|ocean|sea|lake|river|field|desert|nature|valley/.test(s))return'landscape'; if(/building|architecture|city|street|urban|bridge|tower|facade|room|alley/.test(s))return'arch'; return'object'; }
+        function dLight(s) { s=(s||'').toLowerCase(); if(/golden|sunset|sunrise|dusk|dawn|warm light|evening|magic hour/.test(s))return'golden'; if(/night|low light|dark|neon|lamp|candle|dim|interior|practical/.test(s))return'lowlight'; if(/mixed|conflict|fluorescent|tungsten|window|warm.+cool|cool.+warm/.test(s))return'mixed'; return'overcast'; }
+        function dStyle(s) { s=(s||'').toLowerCase(); if(/fantasy|concept art|magical|fantastical/.test(s))return'fantasy'; if(/street|documentary|candid|reportage|journalism|leiter|bresson|vivian|fan ho|arbus|winogrand/.test(s))return'street'; if(/portrait|editorial|fashion|magazine|studio|sherman|avedon/.test(s))return'portrait'; if(/landscape|nature|wilderness|environmental/.test(s))return'landscape'; if(/architect|urban|building|infrastructure|minimal/.test(s))return'arch'; if(/macro|close.?up|detail/.test(s))return'macro'; return'street'; }
+        function dTex(s) { s=(s||'').toLowerCase(); if(/digital|crisp|clean|sharp|modern|precise/.test(s))return'digital'; if(/medium format|hasselblad|mamiya|large format/.test(s))return'medium'; if(/aged|faded|expired|vintage|damaged/.test(s))return'aged'; return'film'; }
+        function dPlat(s) { s=(s||'').toLowerCase(); if(/midjourney|mj/.test(s))return'mj'; if(/dall|dalle/.test(s))return'dalle'; if(/stable|flux|sd/.test(s))return'sd'; return'universal'; }
 
-        function getTitle(a) { const mM = { melancholy: 'Quiet Sorrow', tense: 'Charged Tension', peaceful: 'Still Light', dramatic: 'Heavy Air', warm: 'Tender Moment', dark: 'Shadow Hours', lonely: 'Solitary Frame', euphoric: 'Open Joy', uneasy: 'Unsettled Frame', intimate: 'Close Distance' }; const sM = { city: 'Urban', urban: 'Urban', nature: 'Natural', indoor: 'Interior', night: 'Night', rain: 'Rain', fog: 'Fog', forest: 'Forest', ocean: 'Coastal', street: 'Street', alley: 'Alley', studio: 'Studio' }; const mood = (a.mood || '').toLowerCase(), setting = (a.setting || '').toLowerCase(); for (const [k, v] of Object.entries(mM)) if (mood.includes(k)) { for (const [sk, sv] of Object.entries(sM)) if (setting.includes(sk)) return sv + ' \u2014 ' + v; return v + ', Held Still'; } for (const [sk, sv] of Object.entries(sM)) if (setting.includes(sk)) return sv + ' Study'; return 'A Frame Considered'; }
-        function getReasons(sub, light, style, tex) { const r = []; if (sub === 'person') { r.push("Skin texture is explicitly preserved — AI generators smooth faces by default, removing pores, fine lines, and blemishes. This prompt actively resists that."); r.push("Nothing on the subject is described as 'perfect' — that word signals AI to idealize rather than document."); } else if (sub === 'object') r.push("Object surfaces retain micro-wear and abrasion — real objects show use. AI renders everything pristine and new unless instructed otherwise."); else if (sub === 'landscape') r.push("Edge transitions use natural lens softness — real lenses don't resolve every part of the frame identically. Uniform edge sharpness is an AI artifact."); if (light === 'lowlight') { r.push("Grain is matched to low-light conditions — what a real camera sensor produces when working hard in dim environments. Physically accurate, not decorative."); r.push("Color noise in shadows is preserved — subtle color speckling is what sensors produce under stress. Its absence would look synthetic."); } else if (light === 'golden') r.push("Highlight rolloff is kept soft — real film and quality cameras transition gradually into brightness, retaining texture instead of blowing out to white."); else if (light === 'mixed') r.push("Conflicting color temperatures are kept as-is — the tension between warm and cool light sources is an authenticity marker, not an error to correct."); else r.push("Flat overcast light is left flat — the prompt doesn't add artificial contrast or drama that wasn't in the actual lighting conditions."); if (tex === 'film') r.push("35mm grain structure is organic and warm — distinct from digital noise. Optical vignetting comes from the lens itself, not post-processing."); else if (tex === 'digital') r.push("Clean digital rendering without synthetic sharpening — real digital cameras don't hyper-sharpen edges. AI does this automatically unless stopped."); else if (tex === 'medium') r.push("Medium format characteristics preserved — a distinctive tonal richness and center-to-edge sharpness variation that no standard camera achieves."); else if (tex === 'aged') r.push("Film degradation is intentional — expired film shifts colors toward warm yellows, increases grain, and softens contrast in ways no digital filter can replicate."); if (style === 'street') r.push("Practical light contamination is included — real street shots have competing sources: shop signs, headlights, phone screens. These signal authenticity."); else if (style === 'portrait') r.push("Focus plane falloff is physically modeled — sharpness transitions follow how a real lens behaves, not a uniform render with everything equally in focus."); while (r.length < 3) r.push("Shadows are held open — crushed blacks look cinematic but lose all information. Preserved shadow detail makes dark areas feel real and explorable."); return r.slice(0, 5); }
+        function getTitle(a) { const mM={melancholy:'Quiet Sorrow',tense:'Charged Tension',peaceful:'Still Light',dramatic:'Heavy Air',warm:'Tender Moment',dark:'Shadow Hours',lonely:'Solitary Frame',euphoric:'Open Joy',uneasy:'Unsettled Frame',intimate:'Close Distance'}; const sM={city:'Urban',urban:'Urban',nature:'Natural',indoor:'Interior',night:'Night',rain:'Rain',fog:'Fog',forest:'Forest',ocean:'Coastal',street:'Street',alley:'Alley',studio:'Studio'}; const mood=(a.mood||'').toLowerCase(),setting=(a.setting||'').toLowerCase(); for(const[k,v]of Object.entries(mM))if(mood.includes(k)){for(const[sk,sv]of Object.entries(sM))if(setting.includes(sk))return sv+' \u2014 '+v; return v+', Held Still';} for(const[sk,sv]of Object.entries(sM))if(setting.includes(sk))return sv+' Study'; return'A Frame Considered'; }
+        function getReasons(sub,light,style,tex) { const r=[]; if(sub==='person'){r.push("Skin texture is explicitly preserved — AI generators smooth faces by default, removing pores, fine lines, and blemishes. This prompt actively resists that.");r.push("Nothing on the subject is described as 'perfect' — that word signals AI to idealize rather than document.");}else if(sub==='object')r.push("Object surfaces retain micro-wear and abrasion — real objects show use. AI renders everything pristine and new unless instructed otherwise.");else if(sub==='landscape')r.push("Edge transitions use natural lens softness — real lenses don't resolve every part of the frame identically. Uniform edge sharpness is an AI artifact."); if(light==='lowlight'){r.push("Grain is matched to low-light conditions — what a real camera sensor produces when working hard in dim environments. Physically accurate, not decorative.");r.push("Color noise in shadows is preserved — subtle color speckling is what sensors produce under stress. Its absence would look synthetic.");}else if(light==='golden')r.push("Highlight rolloff is kept soft — real film and quality cameras transition gradually into brightness, retaining texture instead of blowing out to white.");else if(light==='mixed')r.push("Conflicting color temperatures are kept as-is — the tension between warm and cool light sources is an authenticity marker, not an error to correct.");else r.push("Flat overcast light is left flat — the prompt doesn't add artificial contrast or drama that wasn't in the actual lighting conditions."); if(tex==='film')r.push("35mm grain structure is organic and warm — distinct from digital noise. Optical vignetting comes from the lens itself, not post-processing.");else if(tex==='digital')r.push("Clean digital rendering without synthetic sharpening — real digital cameras don't hyper-sharpen edges. AI does this automatically unless stopped.");else if(tex==='medium')r.push("Medium format characteristics preserved — a distinctive tonal richness and center-to-edge sharpness variation that no standard camera achieves.");else if(tex==='aged')r.push("Film degradation is intentional — expired film shifts colors toward warm yellows, increases grain, and softens contrast in ways no digital filter can replicate."); if(style==='street')r.push("Practical light contamination is included — real street shots have competing sources: shop signs, headlights, phone screens. These signal authenticity.");else if(style==='portrait')r.push("Focus plane falloff is physically modeled — sharpness transitions follow how a real lens behaves, not a uniform render with everything equally in focus."); while(r.length<3)r.push("Shadows are held open — crushed blacks look cinematic but lose all information. Preserved shadow detail makes dark areas feel real and explorable."); return r.slice(0,5); }
 
-        function buildProse(a, tokens) { const sub = dSub(a.subject), light = dLight(a.lighting), style = dStyle(a.style), tex = dTex(a.texture); const lD = { golden: 'bathed in warm golden-hour light — the sun is low and directional, casting long amber shadows and wrapping gently around the scene', lowlight: 'lit only by practical sources within the scene — dim lamps or available ambient light — with visible grain and shadow areas that hold texture rather than going black', mixed: 'under competing light sources — part warm tungsten, part cool daylight — creating a natural color tension where shadows shift between warm and cool', overcast: 'under soft, even overcast light — no harsh shadows, no dramatic directionality, just diffused natural illumination' }[light] || `lit by ${a.lighting}`; const tD = { film: 'The image has the warm, organic texture of 35mm film — fine grain across the frame, natural color rendering, and corners that soften slightly from optical vignetting.', digital: 'The image is rendered cleanly with digital precision — no grain, no vignetting, every edge resolved exactly as the lens captured it.', medium: 'The image has the richness of medium format photography — a wide tonal range, a sense of depth in every highlight and shadow, and a gentle softness toward the edges of the frame.', aged: 'The image carries the marks of expired film — warm color drift, heavier grain than a fresh roll would produce, and a slight fading of contrast that makes everything feel preserved from another time.' }[tex] || ''; const skinNote = sub === 'person' ? " The subject's skin is photographed as it is — pores, fine lines, and natural imperfections intact. Nothing has been smoothed or idealized." : ''; const tokenStr = tokens.length ? ' Additional realism instructions: ' + tokens.join('. ') + '.' : ''; const styleWord = { street: 'documentary street', portrait: 'editorial portrait', landscape: 'environmental landscape', arch: 'architectural', macro: 'close-up macro' }[style] || 'documentary'; return `This is a ${styleWord} photograph of ${a.subject}, set in ${a.setting}, ${lD}. The mood is ${a.mood} — that feeling should be present in every element of the frame, from how the light falls to how much of the scene is shown.\n\n${tD}${skinNote}${tokenStr}\n\nDo not smooth surfaces, beautify subjects, or add artificial sharpening. Do not crush the shadow areas to pure black — keep detail visible in the dark. Do not over-saturate or add HDR processing. Let the image feel like it was taken rather than made.`; }
-        function buildMJ(a, tokens) { const sub = dSub(a.subject), light = dLight(a.lighting), style = dStyle(a.style), tex = dTex(a.texture); const lT = { golden: 'golden hour light, directional warm sun, long shadows, analog highlight rolloff', lowlight: 'low light, practical lamp illumination, high-iso grain, chroma noise in shadows', overcast: 'overcast diffused light, no direct sun, flat tonal range, real lens falloff', mixed: 'mixed color temperatures, tungsten-daylight conflict, warm and cool sources competing' }[light] || 'natural light'; const stT = { street: 'street photography, documentary, candid reportage, optical vignette', portrait: 'portrait photography, editorial, shallow depth of field, focus plane rolloff', landscape: 'landscape photography, wide depth of field, environmental scale', arch: 'architectural photography, optical vignette, edge behavior at corners', macro: 'macro close-up, extreme shallow depth of field' }[style] || 'documentary photography'; const txT = { film: '35mm film grain, optical vignette, analog texture, natural color palette', digital: 'clean digital, precise rendering, no synthetic sharpening', medium: 'medium format, center-to-edge sharpness rolloff, rich tonal range', aged: 'expired film, heavy grain, warm color shift, faded contrast' }[tex] || '35mm film grain, optical vignette'; const real = tokens.map(t => t.replace(/\s+/g, ' ')).join(', '); const ar = style === 'landscape' ? '16:9' : (a.mood || '').toLowerCase().includes('claustro') ? '2:3' : '4:5'; return `${a.subject}, ${a.setting}, ${lT}, ${a.mood} atmosphere, ${stT}, ${txT}, ${real} --ar ${ar} --style raw --v 6.1 --no smooth skin, airbrushed, HDR, oversaturated, plastic, synthetic sharpening, beauty filter, hyperrealistic, perfect symmetry, artificial lighting`; }
-        function buildDALLE(a, tokens) { const sub = dSub(a.subject), light = dLight(a.lighting), style = dStyle(a.style), tex = dTex(a.texture); const styleStr = { street: 'street documentary', portrait: 'editorial portrait', landscape: 'environmental landscape', arch: 'architectural', macro: 'close-up macro' }[style] || 'documentary'; const lStr = { golden: 'warm golden-hour light with directional sun, long shadows, and a gradual highlight transition that retains texture near bright areas', lowlight: 'dim practical light from within the scene, with visible grain and subtle color speckling in the shadow areas', overcast: 'soft flat overcast daylight — no harsh shadows, even tonal transitions throughout the frame', mixed: 'mixed lighting from competing sources — part warm tungsten, part cool daylight — creating a natural color tension' }[light] || a.lighting; const skinNote = sub === 'person' ? 'Preserve natural skin texture with visible pores, fine lines, and the slight imperfections of a real human face. Do not smooth, beautify, or airbrush. ' : ''; const txStr = { film: 'Shot on 35mm film, with natural grain structure, slight optical vignetting at corners, and the warm organic quality of analog photography.', digital: 'Shot on a digital camera. Clean, precise rendering without synthetic sharpening or artificial edge enhancement.', medium: 'Shot on medium format film — rich tonal range, gentle center-to-edge sharpness variation, and a sense of depth in every tone.', aged: 'Shot on expired film — heavy grain, warm color shift toward yellows, faded contrast, signs of chemical decay.' }[tex] || ''; const tokenStr = tokens.length ? ' ' + tokens.join('. ') + '.' : ''; return `A ${styleStr} photograph of ${a.subject} in ${a.setting}. The lighting is ${lStr}, creating a ${a.mood} feeling. ${skinNote}${txStr}${tokenStr} Preserve micro surface detail throughout. Keep shadow areas open with visible detail rather than crushing them to black. Do not add artificial sharpening or edge enhancement. Do not include any text in the image.`; }
-        function buildSD(a, tokens) { const sub = dSub(a.subject), light = dLight(a.lighting), style = dStyle(a.style), tex = dTex(a.texture); const pos = [`(${a.subject}:1.2)`, a.setting]; pos.push({ golden: '(golden hour light:1.3), warm directional sun, long shadows, (analog highlight rolloff:1.2)', lowlight: '(low light:1.3), practical lamp illumination, (film grain:1.3), chroma noise in shadows', overcast: 'overcast light, flat soft illumination, (real lens falloff:1.1)', mixed: '(mixed color temperature:1.2), warm tungsten light, cool daylight window, color tension' }[light] || 'natural light'); pos.push(`${a.mood} mood, atmospheric`); pos.push({ street: '(street photography:1.2), documentary, (candid:1.1), optical vignette', portrait: '(portrait photography:1.2), editorial, (optical focus falloff:1.2)', landscape: '(landscape photography:1.2), wide depth of field, environmental scale', arch: '(architectural photography:1.2), (optical vignette:1.1), real lens edge behavior', macro: '(macro photography:1.3), extreme close-up, very shallow depth of field' }[style] || '(documentary photography:1.2)'); pos.push({ film: '(35mm film grain:1.3), (optical vignette:1.2), analog texture, warm film palette', digital: 'clean digital, sharp rendering, (no over-sharpening:1.2)', medium: '(medium format film:1.2), rich tonal range, center-sharp edge-soft', aged: '(expired film:1.3), (heavy grain:1.3), warm color shift, faded contrast' }[tex] || '(35mm film grain:1.3)'); if (sub === 'person') pos.push('(natural skin texture:1.3), (visible pores:1.2), skin imperfections preserved, no airbrushing'); tokens.forEach(t => pos.push(`(${t}:1.1)`)); pos.push('(micro texture detail:1.2), shadow detail preserved, physically accurate lighting, no synthetic smoothing'); return { pos: pos.join(', '), neg: '(smooth skin:1.4), (airbrushed:1.4), (plastic skin:1.3), (overprocessed:1.3), (HDR:1.2), (synthetic sharpening:1.3), (edge haloing:1.3), (beauty filter:1.4), (perfect symmetry:1.1), hyperrealistic, watermark, text, logo, oversaturated' }; }
+        function buildProse(a,tokens) { const sub=dSub(a.subject),light=dLight(a.lighting),style=dStyle(a.style),tex=dTex(a.texture); const lD={golden:'bathed in warm golden-hour light — the sun is low and directional, casting long amber shadows and wrapping gently around the scene',lowlight:'lit only by practical sources within the scene — dim lamps or available ambient light — with visible grain and shadow areas that hold texture rather than going black',mixed:'under competing light sources — part warm tungsten, part cool daylight — creating a natural color tension where shadows shift between warm and cool',overcast:'under soft, even overcast light — no harsh shadows, no dramatic directionality, just diffused natural illumination'}[light]||`lit by ${a.lighting}`; const tD={film:'The image has the warm, organic texture of 35mm film — fine grain across the frame, natural color rendering, and corners that soften slightly from optical vignetting.',digital:'The image is rendered cleanly with digital precision — no grain, no vignetting, every edge resolved exactly as the lens captured it.',medium:'The image has the richness of medium format photography — a wide tonal range, a sense of depth in every highlight and shadow, and a gentle softness toward the edges of the frame.',aged:'The image carries the marks of expired film — warm color drift, heavier grain than a fresh roll would produce, and a slight fading of contrast that makes everything feel preserved from another time.'}[tex]||''; const skinNote=sub==='person'?" The subject's skin is photographed as it is — pores, fine lines, and natural imperfections intact. Nothing has been smoothed or idealized.":''; const tokenStr=tokens.length?' Additional realism instructions: '+tokens.join('. ')+'.':''; const styleWord={street:'documentary street',portrait:'editorial portrait',landscape:'environmental landscape',arch:'architectural',macro:'close-up macro',fantasy:'fantasy concept art'}[style]||'documentary'; return `This is a ${styleWord} photograph of ${a.subject}, set in ${a.setting}, ${lD}. The mood is ${a.mood} — that feeling should be present in every element of the frame, from how the light falls to how much of the scene is shown.\n\n${tD}${skinNote}${tokenStr}\n\nDo not smooth surfaces, beautify subjects, or add artificial sharpening. Do not crush the shadow areas to pure black — keep detail visible in the dark. Do not over-saturate or add HDR processing. Let the image feel like it was taken rather than made.`; }
+        function buildMJ(a,tokens) { const sub=dSub(a.subject),light=dLight(a.lighting),style=dStyle(a.style),tex=dTex(a.texture); const lT={golden:'golden hour light, directional warm sun, long shadows, analog highlight rolloff',lowlight:'low light, practical lamp illumination, high-iso grain, chroma noise in shadows',overcast:'overcast diffused light, no direct sun, flat tonal range, real lens falloff',mixed:'mixed color temperatures, tungsten-daylight conflict, warm and cool sources competing'}[light]||'natural light'; const stT={street:'street photography, documentary, candid reportage, optical vignette',portrait:'portrait photography, editorial, shallow depth of field, focus plane rolloff',landscape:'landscape photography, wide depth of field, environmental scale',arch:'architectural photography, optical vignette, edge behavior at corners',macro:'macro close-up, extreme shallow depth of field',fantasy:'fantasy concept art, cinematic, magical realism'}[style]||'documentary photography'; const txT={film:'35mm film grain, optical vignette, analog texture, natural color palette',digital:'clean digital, precise rendering, no synthetic sharpening',medium:'medium format, center-to-edge sharpness rolloff, rich tonal range',aged:'expired film, heavy grain, warm color shift, faded contrast'}[tex]||'35mm film grain, optical vignette'; const real=tokens.map(t=>t.replace(/_/g,' ')).join(', '); const ar=style==='landscape'?'16:9':((a.mood||'').toLowerCase().includes('claustro')?'2:3':'4:5'); return `${a.subject}, ${a.setting}, ${lT}, ${a.mood} atmosphere, ${stT}, ${txT}, ${real} --ar ${ar} --style raw --v 6.1 --no smooth skin, airbrushed, HDR, oversaturated, plastic, synthetic sharpening, beauty filter, hyperrealistic, perfect symmetry, artificial lighting`; }
+        function buildDALLE(a,tokens) { const sub=dSub(a.subject),light=dLight(a.lighting),style=dStyle(a.style),tex=dTex(a.texture); const styleStr={street:'street documentary',portrait:'editorial portrait',landscape:'environmental landscape',arch:'architectural',macro:'close-up macro',fantasy:'fantasy concept art'}[style]||'documentary'; const lStr={golden:'warm golden-hour light with directional sun, long shadows, and a gradual highlight transition that retains texture near bright areas',lowlight:'dim practical light from within the scene, with visible grain and subtle color speckling in the shadow areas',overcast:'soft flat overcast daylight — no harsh shadows, even tonal transitions throughout the frame',mixed:'mixed lighting from competing sources — part warm tungsten, part cool daylight — creating a natural color tension'}[light]||a.lighting; const skinNote=sub==='person'?'Preserve natural skin texture with visible pores, fine lines, and the slight imperfections of a real human face. Do not smooth, beautify, or airbrush. ':''; const txStr={film:'Shot on 35mm film, with natural grain structure, slight optical vignetting at corners, and the warm organic quality of analog photography.',digital:'Shot on a digital camera. Clean, precise rendering without synthetic sharpening or artificial edge enhancement.',medium:'Shot on medium format film — rich tonal range, gentle center-to-edge sharpness variation, and a sense of depth in every tone.',aged:'Shot on expired film — heavy grain, warm color shift toward yellows, faded contrast, signs of chemical decay.'}[tex]||''; const tokenStr=tokens.length?' '+tokens.join('. ')+'.':''; return `A ${styleStr} photograph of ${a.subject} in ${a.setting}. The lighting is ${lStr}, creating a ${a.mood} feeling. ${skinNote}${txStr}${tokenStr} Preserve micro surface detail throughout. Keep shadow areas open with visible detail rather than crushing them to black. Do not add artificial sharpening or edge enhancement. Do not include any text in the image.`; }
+        function buildSD(a,tokens) { const sub=dSub(a.subject),light=dLight(a.lighting),style=dStyle(a.style),tex=dTex(a.texture); const pos=[`(${a.subject}:1.2)`,a.setting]; pos.push({golden:'(golden hour light:1.3), warm directional sun, long shadows, (analog highlight rolloff:1.2)',lowlight:'(low light:1.3), practical lamp illumination, (film grain:1.3), chroma noise in shadows',overcast:'overcast light, flat soft illumination, (real lens falloff:1.1)',mixed:'(mixed color temperature:1.2), warm tungsten light, cool daylight window, color tension'}[light]||'natural light'); pos.push(`${a.mood} mood, atmospheric`); pos.push({street:'(street photography:1.2), documentary, (candid:1.1), optical vignette',portrait:'(portrait photography:1.2), editorial, (optical focus falloff:1.2)',landscape:'(landscape photography:1.2), wide depth of field, environmental scale',arch:'(architectural photography:1.2), (optical vignette:1.1), real lens edge behavior',macro:'(macro photography:1.3), extreme close-up, very shallow depth of field',fantasy:'(fantasy concept art:1.2), cinematic, magical realism, (real_mtf_falloff:1.1)'}[style]||'(documentary photography:1.2)'); pos.push({film:'(35mm film grain:1.3), (optical vignette:1.2), analog texture, warm film palette',digital:'clean digital, sharp rendering, (no over-sharpening:1.2)',medium:'(medium format film:1.2), rich tonal range, center-sharp edge-soft',aged:'(expired film:1.3), (heavy grain:1.3), warm color shift, faded contrast'}[tex]||'(35mm film grain:1.3)'); if(sub==='person')pos.push('(natural skin texture:1.3), (visible pores:1.2), skin imperfections preserved, no airbrushing'); tokens.forEach(t=>pos.push(`(${t}:1.1)`)); pos.push('(micro texture detail:1.2), shadow detail preserved, physically accurate lighting, no synthetic smoothing'); return{pos:pos.join(', '),neg:'(smooth skin:1.4), (airbrushed:1.4), (plastic skin:1.3), (overprocessed:1.3), (HDR:1.2), (synthetic sharpening:1.3), (edge haloing:1.3), (beauty filter:1.4), (perfect symmetry:1.1), hyperrealistic, watermark, text, logo, oversaturated'}; }
 
-        function buildResult(a) { const tokens = getInjectedTokens(a); const p = dPlat(a.platform), sub = dSub(a.subject), light = dLight(a.lighting), style = dStyle(a.style), tex = dTex(a.texture); return { platform: p, title: getTitle(a), reasons: getReasons(sub, light, style, tex), prose: buildProse(a, tokens), mj: buildMJ(a, tokens), dalle: buildDALLE(a, tokens), sd: buildSD(a, tokens) }; }
+        function buildResult(a) { const tokens=getInjectedTokens(a),p=dPlat(a.platform),sub=dSub(a.subject),light=dLight(a.lighting),style=dStyle(a.style),tex=dTex(a.texture); return{platform:p,title:getTitle(a),reasons:getReasons(sub,light,style,tex),prose:buildProse(a,tokens),mj:buildMJ(a,tokens),dalle:buildDALLE(a,tokens),sd:buildSD(a,tokens),tokens}; }
 
-        function h(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        // ── HTML HELPERS ──────────────────────────────────────────────
+        function h(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-        function addBot(html, extras) { const wrap = document.createElement('div'); wrap.className = 'msg bot'; const bub = document.createElement('div'); bub.className = 'bubble'; bub.innerHTML = html; wrap.appendChild(bub); if (extras?.opts) { const og = document.createElement('div'); og.className = 'options-grid'; extras.opts.forEach(o => { const b = document.createElement('button'); b.className = 'opt-btn'; b.innerHTML = o; b.onclick = () => pickOpt(b, b.textContent, og); og.appendChild(b); }); wrap.appendChild(og); } if (extras?.confirm) { const cw = document.createElement('div'); cw.className = 'confirm-btns'; cw.innerHTML = `<button class="btn-yes" id="btnYes" onclick="doConfirm(true)">Looks right &#8599;</button><button class="btn-no" id="btnNo" onclick="doConfirm(false)">Restart</button>`; wrap.appendChild(cw); } document.getElementById('messages').appendChild(wrap); scroll(); }
-        function addUser(t) { const w = document.createElement('div'); w.className = 'msg user'; w.innerHTML = `<div class="bubble">${h(t)}</div>`; document.getElementById('messages').appendChild(w); scroll(); }
-        function addTyping() { const w = document.createElement('div'); w.className = 'msg bot'; w.id = 'typing'; w.innerHTML = '<div class="bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>'; document.getElementById('messages').appendChild(w); scroll(); }
-        function removeTyping() { const e = document.getElementById('typing'); if (e) e.remove(); }
-        function scroll() { const m = document.getElementById('messages'); m.scrollTop = m.scrollHeight; }
-        function pickOpt(btn, val, grid) { grid.querySelectorAll('.opt-btn').forEach(b => { b.classList.remove('selected'); b.style.opacity = '0.35'; }); btn.classList.add('selected'); btn.style.opacity = '1'; document.getElementById('userInput').value = val; setTimeout(() => sendMsg(), 80); }
-        function disableOpts() { document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true); }
-        function disableConfirm() { ['btnYes', 'btnNo'].forEach(id => { const e = document.getElementById(id); if (e) e.disabled = true; }); }
+        function addBot(html, extras) {
+            const wrap = document.createElement('div');
+            wrap.className = 'msg bot';
+            const bub = document.createElement('div');
+            bub.className = 'bubble';
+            bub.innerHTML = html;
+            wrap.appendChild(bub);
+            if (extras?.opts) {
+                const og = document.createElement('div');
+                og.className = 'options-grid';
+                extras.opts.forEach(o => {
+                    const b = document.createElement('button');
+                    b.className = 'opt-btn';
+                    b.innerHTML = o;
+                    b.onclick = () => pickOpt(b, b.textContent, og);
+                    og.appendChild(b);
+                });
+                wrap.appendChild(og);
+            }
+            if (extras?.confirm) {
+                const cw = document.createElement('div');
+                cw.className = 'confirm-btns';
+                cw.innerHTML = `<button class="btn-yes" id="btnYes" onclick="doConfirm(true)">Looks right &#8599;</button><button class="btn-no" id="btnNo" onclick="doConfirm(false)">Restart</button>`;
+                wrap.appendChild(cw);
+            }
+            document.getElementById('messages').appendChild(wrap);
+            scroll();
+        }
+        function addUser(t) { const w=document.createElement('div'); w.className='msg user'; w.innerHTML=`<div class="bubble">${h(t)}</div>`; document.getElementById('messages').appendChild(w); scroll(); }
+        function addTyping() { const w=document.createElement('div'); w.className='msg bot'; w.id='typing'; w.innerHTML='<div class="bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>'; document.getElementById('messages').appendChild(w); scroll(); }
+        function removeTyping() { const e=document.getElementById('typing'); if(e)e.remove(); }
+        function scroll() { const m=document.getElementById('messages'); m.scrollTop=m.scrollHeight; }
+
+        function pickOpt(btn, val, grid) {
+            grid.querySelectorAll('.opt-btn').forEach(b => { b.classList.remove('selected'); b.style.opacity='0.35'; });
+            btn.classList.add('selected');
+            btn.style.opacity='1';
+            const inp = document.getElementById('userInput');
+            if (inp) inp.value = val;
+            setTimeout(() => {
+                sendMsg();
+                // Re-focus after the option click
+                setTimeout(() => { const i2=document.getElementById('userInput'); if(i2)i2.focus(); }, 80);
+            }, 80);
+        }
+        function disableOpts() { document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true); }
+        function disableConfirm() { ['btnYes','btnNo'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=true;}); }
 
         function setFooterDone() {
-            const footer = document.getElementById('chatFooter');
-            footer.innerHTML = '<div class="done-footer"><span class="new-shot-link" onclick="resetApp()">&#8635; Start a new shot</span></div>';
+            document.getElementById('chatFooter').innerHTML =
+                '<div class="done-footer"><span class="new-shot-link" onclick="resetApp()">&#8635; Start a new shot</span></div>';
         }
-
         function setFooterAsking() {
-            const footer = document.getElementById('chatFooter');
-            footer.innerHTML = `
+            document.getElementById('chatFooter').innerHTML = `
                 <div class="input-row" id="inputRow">
-                    <input type="text" class="chat-input-field" id="userInput" placeholder="Type your answer..." onkeydown="if(event.key==='Enter')sendMsg()" />
+                    <button class="back-btn" id="backBtn" onclick="goBack()" title="Revise previous answer" disabled>&#8592;</button>
+                    <input type="text" class="chat-input-field" id="userInput" placeholder="Type your answer..."
+                        onkeydown="if(event.key==='Enter')sendMsg()" />
                     <button class="send-btn" onclick="sendMsg()">&#8594;</button>
                 </div>
                 <div class="hint">Enter to send &nbsp;&bull;&nbsp; type <em>skip</em> to use a default</div>`;
-            document.getElementById('userInput').focus();
+            updateBackBtn();
+            setTimeout(() => { const inp=document.getElementById('userInput'); if(inp)inp.focus(); }, 50);
         }
 
         function sendMsg() {
@@ -855,13 +1061,30 @@
             addUser(isSkip ? '(skip)' : raw);
             ST.answers[q.id] = answer;
             const photo = detectPhotographer(answer);
-            if (photo) { const filled = applyPhotographer(photo.data); if (filled.length) { addBot(`<em>Recognized photographer ${photo.name} — auto-filling ${filled.join(', ')}.</em>`); } }
+            if (photo) { const filled=applyPhotographer(photo.data); if(filled.length) addBot(`<em>Recognized photographer ${photo.name} — auto-filling ${filled.join(', ')}.</em>`); }
             ST.step++;
-            setTimeout(() => { while (ST.step < QS.length && ST.answers[QS[ST.step].id]) { ST.step++; } addTyping(); setTimeout(() => { removeTyping(); if (!isSkip) addBot(q.ack(answer)); if (ST.step < QS.length) { const nq = QS[ST.step]; const inp2 = document.getElementById('userInput'); if (inp2) inp2.placeholder = nq.ph; addBot(nq.q, { opts: nq.opts }); } else { showConfirm(); } }, 500); }, 120);
+            updateBackBtn();
+            setTimeout(() => {
+                while (ST.step < QS.length && ST.answers[QS[ST.step].id]) { ST.step++; }
+                addTyping();
+                setTimeout(() => {
+                    removeTyping();
+                    if (!isSkip) addBot(q.ack(answer));
+                    if (ST.step < QS.length) {
+                        const nq = QS[ST.step];
+                        const inp2 = document.getElementById('userInput');
+                        if (inp2) { inp2.placeholder = nq.ph; inp2.focus(); }
+                        addBot(progressDotsHtml(ST.step) + nq.q, { opts: nq.opts });
+                    } else {
+                        showConfirm();
+                    }
+                }, 500);
+            }, 120);
         }
 
         function showConfirm() {
             ST.confirming = true;
+            updateBackBtn();
             const a = ST.answers;
             const lines = [
                 `<strong>Subject:</strong> ${h(a.subject)}`,
@@ -882,28 +1105,148 @@
             disableConfirm();
             if (yes) {
                 addUser('Looks right — build it.');
-                setTimeout(() => { addTyping(); setTimeout(() => { removeTyping(); renderOutput(); addBot('Your prompts are ready in the middle panel. Use the tabs to switch between <strong>Prose</strong>, platform formats, and <strong>Why?</strong>'); ST.phase = 'done'; setFooterDone(); }, 1000); }, 200);
+                setTimeout(() => { addTyping(); setTimeout(() => { removeTyping(); renderOutput(); addBot('Your prompts are ready in the middle panel. Use the tabs to switch between <strong>Prose</strong>, platform formats, and <strong>Why?</strong> Hover over underlined tokens for plain-English explanations.'); ST.phase='done'; setFooterDone(); }, 1000); }, 200);
             } else {
                 addUser('Restart.');
-                ST.step = 0; ST.answers = {};
-                setTimeout(() => { addBot("No problem &mdash; let&rsquo;s redo it."); setTimeout(() => { setFooterAsking(); const inp = document.getElementById('userInput'); if (inp) { inp.placeholder = QS[0].ph; inp.focus(); } addBot(QS[0].q, { opts: QS[0].opts }); }, 400); }, 300);
+                ST.step=0; ST.answers={};
+                setTimeout(() => { addBot("No problem &mdash; let&rsquo;s redo it."); setTimeout(() => { setFooterAsking(); const inp=document.getElementById('userInput'); if(inp){inp.placeholder=QS[0].ph;inp.focus();} addBot(progressDotsHtml(0)+QS[0].q,{opts:QS[0].opts}); }, 400); }, 300);
             }
         }
 
-        function renderOutput() { const R = buildResult(ST.answers), p = R.platform, panel = document.getElementById('promptPanel'); const tabs = [{ id: 'prose', label: 'Prose' }]; if (p === 'mj' || p === 'universal') tabs.push({ id: 'mj', label: 'Midjourney' }); if (p === 'dalle' || p === 'universal') tabs.push({ id: 'dalle', label: 'DALL\u2011E 3' }); if (p === 'sd' || p === 'universal') tabs.push({ id: 'sd', label: 'SD / Flux' }); tabs.push({ id: 'why', label: 'Why?' }); const tabHtml = tabs.map((t, i) => `<button class="ptab${i===0?' active':''}" onclick="switchPTab('${t.id}',this)">${t.label}</button>`).join(''); const mjS = (p === 'mj' || p === 'universal') ? `<div id="ps-mj" class="prompt-section">${pCard('Midjourney Prompt',R.mj,'mj-p',false,false)}</div>` : ''; const daS = (p === 'dalle' || p === 'universal') ? `<div id="ps-dalle" class="prompt-section">${pCard('DALL\u2011E 3 Prompt',R.dalle,'dalle-p',false,false)}</div>` : ''; const sdS = (p === 'sd' || p === 'universal') ? `<div id="ps-sd" class="prompt-section">${pCard('Positive Prompt',R.sd.pos,'sd-pos',false,false)}${pCard('Negative Prompt',R.sd.neg,'sd-neg',true,false)}<p class="cfg-note">Recommended CFG: 7&ndash;9 for photographic realism</p></div>` : ''; const whyH = R.reasons.map(r => `<li>${h(r)}</li>`).join(''); panel.innerHTML = `<div class="shot-title">${h(R.title)}</div><div class="platform-tabs">${tabHtml}</div><div id="ps-prose" class="prompt-section active">${pCard('Natural Language \u2014 Prose',R.prose,'prose-p',false,true)}<p class="cfg-note">Edit this freely, or paste it into any generator that accepts natural language descriptions.</p></div>${mjS}${daS}${sdS}<div id="ps-why" class="prompt-section"><div class="why-card"><div class="why-title">Why these realism choices?</div><ul class="why-list">${whyH}</ul></div></div><span class="restart-link" onclick="resetApp()">&#8635; Start a new shot</span>`; }
-        function pCard(label, text, id, isNeg, isProse) { const cls = isNeg ? ' neg' : (isProse ? ' prose-style' : ''); return `<div class="prompt-card"><div class="prompt-card-header"><span class="card-label">${label}</span><button class="copy-btn" data-target="${id}" onclick="copyP(this)">Copy</button></div><pre class="prompt-text${cls}" id="${id}">${h(text)}</pre></div>`; }
-        function switchPTab(id, btn) { document.querySelectorAll('.prompt-section').forEach(e => e.classList.remove('active')); document.querySelectorAll('.ptab').forEach(e => e.classList.remove('active')); const sec = document.getElementById('ps-' + id); if (sec) sec.classList.add('active'); if (btn) btn.classList.add('active'); document.getElementById('promptPanel').scrollTop = 0; }
-        function copyP(btn) { const txt = document.getElementById(btn.getAttribute('data-target')).textContent; const done = () => { btn.textContent = 'Copied!'; btn.classList.add('done'); setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('done'); }, 2000); }; if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done); else { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done(); } }
+        // ── RENDER OUTPUT ─────────────────────────────────────────────
+        function renderOutput() {
+            currentResult = buildResult(ST.answers);
+            const R = currentResult, p = R.platform, panel = document.getElementById('promptPanel');
+            const tabs = [{ id:'prose', label:'Prose' }];
+            if (p==='mj'||p==='universal') tabs.push({id:'mj',label:'Midjourney'});
+            if (p==='dalle'||p==='universal') tabs.push({id:'dalle',label:'DALL\u2011E 3'});
+            if (p==='sd'||p==='universal') tabs.push({id:'sd',label:'SD / Flux'});
+            tabs.push({id:'why',label:'Why?'});
+            const tabHtml = tabs.map((t,i)=>`<button class="ptab${i===0?' active':''}" onclick="switchPTab('${t.id}',this)">${t.label}</button>`).join('');
+            const mjS = (p==='mj'||p==='universal') ? `<div id="ps-mj" class="prompt-section">${pCard('Midjourney Prompt',R.mj,'mj-p',false,false,true)}</div>` : '';
+            const daS = (p==='dalle'||p==='universal') ? `<div id="ps-dalle" class="prompt-section">${pCard('DALL\u2011E 3 Prompt',R.dalle,'dalle-p',false,false,true)}</div>` : '';
+            const sdS = (p==='sd'||p==='universal') ? `<div id="ps-sd" class="prompt-section">${pCard('Positive Prompt',R.sd.pos,'sd-pos',false,false,true)}${pCard('Negative Prompt',R.sd.neg,'sd-neg',true,false,false)}<p class="cfg-note">Recommended CFG: 7&ndash;9 for photographic realism</p></div>` : '';
+            const whyH = R.reasons.map(r=>`<li>${h(r)}</li>`).join('');
+            panel.innerHTML = `
+                <div class="shot-title">${h(R.title)}</div>
+                <div class="prompt-actions">
+                    <div class="platform-tabs">${tabHtml}</div>
+                    <button class="save-md-btn" onclick="saveMD()" title="Save all prompts as a Markdown file">&#8595; .md</button>
+                </div>
+                <div id="ps-prose" class="prompt-section active">${pCard('Natural Language \u2014 Prose',R.prose,'prose-p',false,true,false)}<p class="cfg-note">Edit this freely, or paste it into any generator that accepts natural language descriptions.</p></div>
+                ${mjS}${daS}${sdS}
+                <div id="ps-why" class="prompt-section"><div class="why-card"><div class="why-title">Why these realism choices?</div><ul class="why-list">${whyH}</ul></div></div>
+                <span class="restart-link" onclick="resetApp()">&#8635; Start a new shot</span>`;
+        }
 
-        function buildWiki(key) { if (key === 'jargon') return ''; const d = WIKI[key]; if (!d) return ''; let html = `<div class="wiki-intro">${d.intro}</div>`; d.groups.forEach(g => { html += `<div class="wiki-group"><div class="wiki-group-hd">${g.label}</div>`; g.items.forEach(it => html += `<div class="wiki-item"><div class="wiki-item-name">${it.name}</div><div class="wiki-item-desc">${it.desc}</div><div class="wiki-item-eg">${it.eg}</div></div>`); html += '</div>'; }); return html; }
-        function buildJargon(filter) { const f = (filter || '').toLowerCase(); const items = f ? GLOSSARY.filter(g => g.term.toLowerCase().includes(f) || g.def.toLowerCase().includes(f)) : GLOSSARY; if (!items.length) return `<div class="g-empty">No terms match &ldquo;${h(filter)}&rdquo;</div>`; return items.map(g => `<div class="g-item"><div class="g-term">${h(g.term)}</div><div class="g-def">${h(g.def)}</div></div>`).join(''); }
-        function switchWiki(key, btn) { document.querySelectorAll('.wtab').forEach(b => b.classList.remove('active')); if (btn) btn.classList.add('active'); const body = document.getElementById('wikiBody'); if (key === 'jargon') { body.innerHTML = `<div class="jargon-search"><input type="text" id="jSearch" placeholder="Search terms..." oninput="filterJargon(this.value)" /></div><div id="jBody">${buildJargon('')}</div>`; setTimeout(() => { const el = document.getElementById('jSearch'); if (el) el.style.cssText = 'width:100%;background:var(--bg-input);border:1px solid var(--border-mid);border-radius:3px;padding:0.4rem 0.65rem;color:var(--text);font-size:0.85rem;outline:none;'; }, 0); } else { body.innerHTML = buildWiki(key); } body.scrollTop = 0; }
-        function filterJargon(val) { const e = document.getElementById('jBody'); if (e) e.innerHTML = buildJargon(val); }
+        function pCard(label, text, id, isNeg, isProse, annotate) {
+            const cls = isNeg ? ' neg' : (isProse ? ' prose-style' : '');
+            const content = annotate ? annotateTokens(text) : h(text);
+            return `<div class="prompt-card"><div class="prompt-card-header"><span class="card-label">${label}</span><button class="copy-btn" data-target="${id}" onclick="copyP(this)">Copy</button></div><pre class="prompt-text${cls}" id="${id}">${content}</pre></div>`;
+        }
 
-        function resetApp() { ST = { step: 0, answers: {}, phase: 'qa', confirming: false }; document.getElementById('messages').innerHTML = ''; document.getElementById('promptPanel').innerHTML = '<div class="empty-state"><span class="empty-icon">&#9651;</span><p>Your prompts will appear here</p><p>Answer the 7 questions on the left.<br>When done, each platform format<br>will be a click away to copy.</p></div>'; setFooterAsking(); initApp(); }
+        function switchPTab(id, btn) {
+            document.querySelectorAll('.prompt-section').forEach(e=>e.classList.remove('active'));
+            document.querySelectorAll('.ptab').forEach(e=>e.classList.remove('active'));
+            const sec=document.getElementById('ps-'+id); if(sec)sec.classList.add('active');
+            if(btn)btn.classList.add('active');
+            document.getElementById('promptPanel').scrollTop=0;
+        }
 
-        function initApp() { const q0 = QS[0]; const inp = document.getElementById('userInput'); if (inp) inp.placeholder = q0.ph; switchWiki('lighting', document.querySelector('.wtab')); setTimeout(() => addBot(`<span style="font-family:var(--serif);font-size:0.95rem;color:var(--accent);">&#128065; FrameLab</span> &mdash; Let&rsquo;s build your PHAUXTO.<br><br>7 plain-English questions. No photography knowledge needed. Type <em>skip</em> for any question and I&rsquo;ll fill in a sensible default.<br><br>The right panel has Lighting, Mood, Style, and Texture examples to help you answer.<br><br><hr style="border: none; border-top: 1px solid var(--border); margin: 0.6rem 0;">${q0.q}`, { opts: q0.opts }), 100); }
+        function copyP(btn) {
+            const el = document.getElementById(btn.getAttribute('data-target'));
+            const txt = el.textContent; // textContent strips the span tags
+            const done = () => { btn.textContent='Copied!'; btn.classList.add('done'); setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('done');},2000); };
+            if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done);
+            else { const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done(); }
+        }
 
+        // ── SAVE MARKDOWN ─────────────────────────────────────────────
+        function saveMD() {
+            if (!currentResult) return;
+            const R = currentResult, a = ST.answers, p = R.platform;
+            let md = `# ${R.title}\n\n`;
+            md += `**Subject:** ${a.subject}  \n`;
+            md += `**Setting:** ${a.setting}  \n`;
+            md += `**Lighting:** ${a.lighting}  \n`;
+            md += `**Mood:** ${a.mood}  \n`;
+            md += `**Style:** ${a.style}  \n`;
+            md += `**Texture:** ${a.texture}  \n`;
+            md += `**Platform:** ${a.platform}  \n\n---\n\n`;
+            md += `## Natural Language (Prose)\n\n\`\`\`\n${R.prose}\n\`\`\`\n\n`;
+            if (p==='mj'||p==='universal') md += `## Midjourney\n\n\`\`\`\n${R.mj}\n\`\`\`\n\n`;
+            if (p==='dalle'||p==='universal') md += `## DALL·E 3\n\n\`\`\`\n${R.dalle}\n\`\`\`\n\n`;
+            if (p==='sd'||p==='universal') {
+                md += `## Stable Diffusion / Flux\n\n### Positive Prompt\n\n\`\`\`\n${R.sd.pos}\n\`\`\`\n\n`;
+                md += `### Negative Prompt\n\n\`\`\`\n${R.sd.neg}\n\`\`\`\n\n`;
+                md += `> Recommended CFG: 7–9 for photographic realism\n\n`;
+            }
+            md += `## Why These Choices\n\n`;
+            R.reasons.forEach(r => { md += `- ${r}\n`; });
+            md += `\n---\n_Generated by [PhauxtoLab](https://omeoni.substack.com)_\n`;
+            const blob = new Blob([md], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = R.title.replace(/[^a-z0-9]+/gi,'_').toLowerCase() + '.md';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ── WIKI ──────────────────────────────────────────────────────
+        function buildWiki(key) {
+            if (key==='jargon') return '';
+            const d=WIKI[key]; if(!d) return '';
+            let html=`<div class="wiki-intro">${d.intro}</div>`;
+            d.groups.forEach(g=>{
+                html+=`<div class="wiki-group"><div class="wiki-group-hd">${g.label}</div>`;
+                g.items.forEach(it=>html+=`<div class="wiki-item"><div class="wiki-item-name">${it.name}</div><div class="wiki-item-desc">${it.desc}</div><div class="wiki-item-eg">${it.eg}</div></div>`);
+                html+='</div>';
+            });
+            return html;
+        }
+        function buildJargon(filter) {
+            const f=(filter||'').toLowerCase();
+            const items=f?GLOSSARY.filter(g=>g.term.toLowerCase().includes(f)||g.def.toLowerCase().includes(f)):GLOSSARY;
+            if(!items.length) return `<div class="g-empty">No terms match &ldquo;${h(filter)}&rdquo;</div>`;
+            return items.map(g=>`<div class="g-item"><div class="g-term">${h(g.term)}</div><div class="g-def">${h(g.def)}</div></div>`).join('');
+        }
+        function switchWiki(key, btn) {
+            document.querySelectorAll('.wtab').forEach(b=>b.classList.remove('active'));
+            if(btn)btn.classList.add('active');
+            const body=document.getElementById('wikiBody');
+            if(key==='jargon') {
+                body.innerHTML=`<div class="jargon-search"><input type="text" id="jSearch" placeholder="Search terms..." oninput="filterJargon(this.value)" /></div><div id="jBody">${buildJargon('')}</div>`;
+            } else {
+                body.innerHTML=buildWiki(key);
+            }
+            body.scrollTop=0;
+        }
+        function filterJargon(val) { const e=document.getElementById('jBody'); if(e)e.innerHTML=buildJargon(val); }
+
+        // ── RESET / INIT ──────────────────────────────────────────────
+        function resetApp() {
+            ST={step:0,answers:{},phase:'qa',confirming:false};
+            currentResult=null;
+            document.getElementById('messages').innerHTML='';
+            document.getElementById('promptPanel').innerHTML='<div class="empty-state"><span class="empty-icon">&#9651;</span><p>Your prompts will appear here</p><p>Answer the 7 questions on the left.<br>When done, each platform format<br>will be a click away to copy.</p></div>';
+            setFooterAsking();
+            initApp();
+        }
+
+        function initApp() {
+            switchWiki('lighting', document.querySelector('.wtab'));
+            setTimeout(() => {
+                addBot(`<span style="font-family:var(--serif);font-size:0.95rem;color:var(--accent);">&#128065; PhauxtoLab</span> &mdash; Let&rsquo;s build your PHAUXTO.<br><br>7 plain-English questions. No photography knowledge needed. Type <em>skip</em> for any question and I&rsquo;ll fill in a sensible default.<br><br>The right panel has Lighting, Mood, Style, and Texture examples to help you answer.`);
+                setTimeout(() => {
+                    addBot(progressDotsHtml(0) + QS[0].q, { opts: QS[0].opts });
+                    const inp=document.getElementById('userInput');
+                    if(inp){inp.placeholder=QS[0].ph; inp.focus();}
+                }, 300);
+            }, 100);
+        }
+
+        initTheme();
         initApp();
     </script>
 </body>
