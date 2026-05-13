@@ -418,6 +418,12 @@
             white-space: pre-wrap;
             word-break: break-word;
             overflow-wrap: break-word;
+            outline: none;
+            min-height: 3rem;
+        }
+        .prompt-text:focus {
+            background: var(--bg-input);
+            border-radius: 2px;
         }
         .prompt-text.neg { color: #b85a5a; }
         .prompt-text.prose-style {
@@ -1123,26 +1129,26 @@
             if (p==='sd'||p==='universal') tabs.push({id:'sd',label:'SD / Flux'});
             tabs.push({id:'why',label:'Why?'});
             const tabHtml = tabs.map((t,i)=>`<button class="ptab${i===0?' active':''}" onclick="switchPTab('${t.id}',this)">${t.label}</button>`).join('');
-            const mjS = (p==='mj'||p==='universal') ? `<div id="ps-mj" class="prompt-section">${pCard('Midjourney Prompt',R.mj,'mj-p',false,false,true)}</div>` : '';
-            const daS = (p==='dalle'||p==='universal') ? `<div id="ps-dalle" class="prompt-section">${pCard('DALL\u2011E 3 Prompt',R.dalle,'dalle-p',false,false,true)}</div>` : '';
-            const sdS = (p==='sd'||p==='universal') ? `<div id="ps-sd" class="prompt-section">${pCard('Positive Prompt',R.sd.pos,'sd-pos',false,false,true)}${pCard('Negative Prompt',R.sd.neg,'sd-neg',true,false,false)}<p class="cfg-note">Recommended CFG: 7&ndash;9 for photographic realism</p></div>` : '';
+            const mjS = (p==='mj'||p==='universal') ? `<div id="ps-mj" class="prompt-section">${pCard('Midjourney Prompt',R.mj,'mj-p',false,true)}</div>` : '';
+            const daS = (p==='dalle'||p==='universal') ? `<div id="ps-dalle" class="prompt-section">${pCard('DALL\u2011E 3 Prompt',R.dalle,'dalle-p',false,true)}</div>` : '';
+            const sdS = (p==='sd'||p==='universal') ? `<div id="ps-sd" class="prompt-section">${pCard('Positive Prompt',R.sd.pos,'sd-pos',false,true)}${pCard('Negative Prompt',R.sd.neg,'sd-neg',true,false)}<p class="cfg-note">Recommended CFG: 7&ndash;9 for photographic realism</p></div>` : '';
             const whyH = R.reasons.map(r=>`<li>${h(r)}</li>`).join('');
             panel.innerHTML = `
                 <div class="shot-title">${h(R.title)}</div>
                 <div class="prompt-actions">
                     <div class="platform-tabs">${tabHtml}</div>
-                    <button class="save-md-btn" onclick="saveMD()" title="Save all prompts as a Markdown file">&#8595; .md</button>
+                    <button class="save-md-btn" onclick="saveMD()" title="Save all prompts as a Markdown file (reads edits)">&#8595; .md</button>
                 </div>
-                <div id="ps-prose" class="prompt-section active">${pCard('Natural Language \u2014 Prose',R.prose,'prose-p',false,true,false)}<p class="cfg-note">Edit this freely, or paste it into any generator that accepts natural language descriptions.</p></div>
+                <div id="ps-prose" class="prompt-section active">${pCard('Natural Language \u2014 Prose',R.prose,'prose-p',false,false)}<p class="cfg-note">Edit this freely, or paste it into any generator that accepts natural language descriptions.</p></div>
                 ${mjS}${daS}${sdS}
                 <div id="ps-why" class="prompt-section"><div class="why-card"><div class="why-title">Why these realism choices?</div><ul class="why-list">${whyH}</ul></div></div>
                 <span class="restart-link" onclick="resetApp()">&#8635; Start a new shot</span>`;
         }
 
-        function pCard(label, text, id, isNeg, isProse, annotate) {
-            const cls = isNeg ? ' neg' : (isProse ? ' prose-style' : '');
+        function pCard(label, text, id, isNeg, annotate) {
+            const cls = isNeg ? ' neg' : '';
             const content = annotate ? annotateTokens(text) : h(text);
-            return `<div class="prompt-card"><div class="prompt-card-header"><span class="card-label">${label}</span><button class="copy-btn" data-target="${id}" onclick="copyP(this)">Copy</button></div><pre class="prompt-text${cls}" id="${id}">${content}</pre></div>`;
+            return `<div class="prompt-card"><div class="prompt-card-header"><span class="card-label">${label}</span><button class="copy-btn" data-target="${id}" onclick="copyP(this)">Copy</button></div><div class="prompt-text${cls}" id="${id}" contenteditable="true">${content}</div></div>`;
         }
 
         function switchPTab(id, btn) {
@@ -1155,17 +1161,24 @@
 
         function copyP(btn) {
             const el = document.getElementById(btn.getAttribute('data-target'));
-            const txt = el.textContent; // textContent strips the span tags
+            const txt = el.textContent;
             const done = () => { btn.textContent='Copied!'; btn.classList.add('done'); setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('done');},2000); };
             if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done);
             else { const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done(); }
         }
 
-        // ── SAVE MARKDOWN ─────────────────────────────────────────────
+        // ── SAVE MARKDOWN (reads editable prompts) ────────────────────
         function saveMD() {
-            if (!currentResult) return;
-            const R = currentResult, a = ST.answers, p = R.platform;
-            let md = `# ${R.title}\n\n`;
+            const a = ST.answers;
+            const title = document.querySelector('.shot-title')?.textContent || currentResult?.title || 'phauxto';
+            const prose = document.getElementById('prose-p')?.textContent || '';
+            const mj = document.getElementById('mj-p')?.textContent || '';
+            const dalle = document.getElementById('dalle-p')?.textContent || '';
+            const sdPos = document.getElementById('sd-pos')?.textContent || '';
+            const sdNeg = document.getElementById('sd-neg')?.textContent || '';
+            const reasons = currentResult?.reasons || [];
+
+            let md = `# ${title}\n\n`;
             md += `**Subject:** ${a.subject}  \n`;
             md += `**Setting:** ${a.setting}  \n`;
             md += `**Lighting:** ${a.lighting}  \n`;
@@ -1173,22 +1186,28 @@
             md += `**Style:** ${a.style}  \n`;
             md += `**Texture:** ${a.texture}  \n`;
             md += `**Platform:** ${a.platform}  \n\n---\n\n`;
-            md += `## Natural Language (Prose)\n\n\`\`\`\n${R.prose}\n\`\`\`\n\n`;
-            if (p==='mj'||p==='universal') md += `## Midjourney\n\n\`\`\`\n${R.mj}\n\`\`\`\n\n`;
-            if (p==='dalle'||p==='universal') md += `## DALL·E 3\n\n\`\`\`\n${R.dalle}\n\`\`\`\n\n`;
-            if (p==='sd'||p==='universal') {
-                md += `## Stable Diffusion / Flux\n\n### Positive Prompt\n\n\`\`\`\n${R.sd.pos}\n\`\`\`\n\n`;
-                md += `### Negative Prompt\n\n\`\`\`\n${R.sd.neg}\n\`\`\`\n\n`;
+
+            if (prose) md += `## Natural Language (Prose)\n\n\`\`\`\n${prose}\n\`\`\`\n\n`;
+            if (mj) md += `## Midjourney\n\n\`\`\`\n${mj}\n\`\`\`\n\n`;
+            if (dalle) md += `## DALL·E 3\n\n\`\`\`\n${dalle}\n\`\`\`\n\n`;
+            if (sdPos) {
+                md += `## Stable Diffusion / Flux\n\n### Positive Prompt\n\n\`\`\`\n${sdPos}\n\`\`\`\n\n`;
+                if (sdNeg) md += `### Negative Prompt\n\n\`\`\`\n${sdNeg}\n\`\`\`\n\n`;
                 md += `> Recommended CFG: 7–9 for photographic realism\n\n`;
             }
-            md += `## Why These Choices\n\n`;
-            R.reasons.forEach(r => { md += `- ${r}\n`; });
+
+            if (reasons.length) {
+                md += `## Why These Choices\n\n`;
+                reasons.forEach(r => { md += `- ${r}\n`; });
+            }
+
             md += `\n---\n_Generated by [PhauxtoLab](https://omeoni.substack.com)_\n`;
+
             const blob = new Blob([md], { type: 'text/markdown' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = R.title.replace(/[^a-z0-9]+/gi,'_').toLowerCase() + '.md';
+            link.download = title.replace(/[^a-z0-9]+/gi,'_').toLowerCase() + '.md';
             link.click();
             URL.revokeObjectURL(url);
         }
